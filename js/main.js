@@ -8,7 +8,10 @@ $.ajax(geonamesUrl).done(function(xml) {
        }
    });
 console.log(geojson);   
-L.geoJson(geojson).addTo(map);
+var markers = L.markerClusterGroup();
+var geoJsonLayer = L.geoJson(geojson);
+markers.addLayer(geoJsonLayer);
+map.addLayer(markers);
 });
 function createFeature(xmlitem){
     var feature = {type: 'Feature', properties:{}, geometry:{type: 'Point'}};
