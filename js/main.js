@@ -1,40 +1,46 @@
-var map = L.mapbox.map('map', 'sharkins.map-uwias8cf');
-//var geojson = {type:'FeatureCollection', features:[]};
+var map = L.mapbox.map('map', 'sharkins.map-uwias8cf',{maxZoom:12});
 var geonamesUrl = 'http://api.geonames.org/rssToGeoRSS?feedUrl=https%3A%2F%2Fnews.google.com%2Fnews%2Ffeeds%3Fgl%3Dca%26q%3Dperu%2Bmining%2Bprotests%26um%3D1%26ie%3DUTF-8%26output%3Drss%26num%3D30&username=sharkinsgis&feedLanguage=en&country=pe&addUngeocodedItems=false';
 var markerMap = {};
 var markersList = [];
 $.ajax(geonamesUrl).done(function(xml) {
     $(xml).find('item').each(function(index){
        if ($(this).children('geo\\:long').length > 0){
+           console.log(this);
            createFeature(index,this);
+           addListItem(index, this);
        }
     });
-    var markers = new L.MarkerClusterGroup();
-    //var geojsonlayer = L.geojson(geojson, {
-        //pointToLayer: function (feature, latlng){
-            //var marker = L.marker(latlng);
-            //markerMap[feature.properties.id] = marker;
-            //return marker;
-        //}});
-    //markers.addLayer(geoJsonLayer);
+    
+    $('li').sort(function(a,b) {
+        return new Date($(a).attr('datetime')) - new Date($(b).attr('datetime'));
+    }).each(function() {
+        $('#articlelist').prepend(this);
+    });
+
+    var markers = new L.MarkerClusterGroup({spiderfyDistanceMultiplier:2, 
+                                           showCoverageOnHover:false});
     markers.addLayers(markersList);
     map.addLayer(markers);
     console.log(markerMap);
+
     map.on('click', function(){
         markers.zoomToShowLayer(markerMap[10], function(){});
     }); 
 });
 function createFeature(index,xmlitem){
-    //var feature = {type: 'Feature', properties:{}, geometry:{type: 'Point'}};
-    //feature.properties.id = index;
-    //feature.properties.title = $(xmlitem).children('title').text();
-    //coords = [parseFloat($(xmlitem).children('geo\\:long').text()),
-                         //parseFloat($(xmlitem).children('geo\\:lat').text())];
-    //feature.geometry.coordinates = coords;  
-    //geojson.features.push(feature);
     var latlng = new L.LatLng(parseFloat($(xmlitem).children('geo\\:lat').text()),
                          parseFloat($(xmlitem).children('geo\\:long').text())); 
     var marker = L.marker(latlng);
     markersList.push(marker);
     markerMap[index] = marker;
-} 
+}
+function addListItem(index, xmlitem){
+    var articleTitle = $(xmlitem).children('title').text(); 
+    var pubdate = new Date($(xmlitem).children('pubDate').text());
+    var newListItem = $('<li/>', {
+        html: articleTitle,
+        'id': index,
+        'datetime': pubdate  
+    });
+    $('#articlelist').append(newListItem);
+}

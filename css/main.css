@@ -1,2 +1,21 @@
-body { margin:0; padding:0; }
-#map { position:absolute; top:0; bottom:0; width:100%; }
+html, body { 
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+#map {
+    width: 80%;
+    height: 90%;
+    float: left;
+}
+#articles {
+    width: 20%;
+    height: 90%;
+    float: right;
+    overflow: auto;
+}
+#footer {
+    height: 10%;
+    clear: both;
+    background-color: blue;
+}
