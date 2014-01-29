@@ -29,7 +29,7 @@ li {
     color: #FFF;
     cursor: pointer;
 }
-li:hover {
+.active, li:hover {
     background-color: #369; 
     color: #FFF;
 }

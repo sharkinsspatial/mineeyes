@@ -16,8 +16,15 @@ $.ajax(geonamesUrl).done(function(xml) {
     }).each(function() {
         $('#articlelist').prepend(this);
     });
+    
+    $('#articlelist li').click(function(e) {
+        $('li.active').removeClass('active');
+        $(this).addClass('active');
+        markers.zoomToShowLayer(markerMap[$(this).attr('id')], function(){});    
+    });
 
-    var markers = new L.MarkerClusterGroup({spiderfyDistanceMultiplier:2, 
+
+    var markers = new L.MarkerClusterGroup({spiderfyDistanceMultiplier:1, 
                                            showCoverageOnHover:false});
     markers.addLayers(markersList);
     map.addLayer(markers);
