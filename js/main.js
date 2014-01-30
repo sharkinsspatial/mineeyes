@@ -5,7 +5,6 @@ var markersList = [];
 $.ajax(geonamesUrl).done(function(xml) {
     $(xml).find('item').each(function(index){
        if ($(this).children('geo\\:long').length > 0){
-           console.log(this);
            createFeature(index,this);
            addListItem(index, this);
        }
