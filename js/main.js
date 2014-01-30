@@ -30,9 +30,6 @@ $.ajax(geonamesUrl).done(function(xml) {
     map.addLayer(markers);
     console.log(markerMap);
 
-    map.on('click', function(){
-        markers.zoomToShowLayer(markerMap[10], function(){});
-    }); 
 });
 function createFeature(index,xmlitem){
     var latlng = new L.LatLng(parseFloat($(xmlitem).children('geo\\:lat').text()),
