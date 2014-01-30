@@ -17,11 +17,19 @@ $.ajax(geonamesUrl).done(function(xml) {
     });
     
     $('#articlelist li').click(function(e) {
+        previousActiveMarker = markerMap[$('li.active').attr('id')];  
+        if (previousActiveMarker)
+            previousActiveMarker.setIcon(new L.Icon.Default());
         $('li.active').removeClass('active');
         $(this).addClass('active');
-        markers.zoomToShowLayer(markerMap[$(this).attr('id')], function(){});    
+        activeMarker = markerMap[$(this).attr('id')];
+        markers.zoomToShowLayer(activeMarker, function(){
+            activeMarker.setIcon(activeIcon);
+        });    
     });
 
+    var activeIcon = new L.Icon.Default({iconUrl: 
+                                        './images/marker-icon-red.png'});
 
     var markers = new L.MarkerClusterGroup({spiderfyDistanceMultiplier:1, 
                                            showCoverageOnHover:false});
