@@ -28,8 +28,6 @@ $.ajax(geonamesUrl).done(function(xml) {
                                            showCoverageOnHover:false});
     markers.addLayers(markersList);
     map.addLayer(markers);
-    console.log(markerMap);
-
 });
 function createFeature(index,xmlitem){
     var latlng = new L.LatLng(parseFloat($(xmlitem).children('geo\\:lat').text()),
