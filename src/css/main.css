@@ -1,0 +1,39 @@
+html, body { 
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+#map {
+    width: 80%;
+    height: 90%;
+    float: left;
+}
+#articles {
+    width: 20%;
+    height: 90%;
+    float: right;
+    overflow: auto;
+    background-color: #3c4e5a;    
+}
+#footer {
+    height: 10%;
+    clear: both;
+    background-color: blue;
+}
+ul {
+    padding: 0;
+}
+li {
+    padding:5px 20px;
+    list-style: none;
+    color: #FFF;
+    cursor: pointer;
+}
+li:hover {
+    background-color: #369; 
+    color: #FFF;
+}
+ul li.active {
+    background-color: #cb2944;
+    color: #FFF;
+}
