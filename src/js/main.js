@@ -1,4 +1,4 @@
-var app = (function () {
+var app = (function ($,L) {
     var map;
     var markerMap = {};
     var markersList = [];
@@ -15,8 +15,9 @@ var app = (function () {
 
             $('#articlelist li').click(function(e) {
                 previousActiveMarker = markerMap[$('li.active').attr('id')];  
-                if (previousActiveMarker)
+                if (previousActiveMarker) {
                     previousActiveMarker.setIcon(new L.Icon.Default());
+                }
                 $('li.active').removeClass('active');
                 $(this).addClass('active');
                 activeMarker = markerMap[$(this).attr('id')];
@@ -47,8 +48,9 @@ var app = (function () {
     function buildRSSUrl() {
         function buildQueryString(data) {
             var params = [];
-            for (var d in data)
+            for (var d in data) {
                 params.push(d + '=' + data[d]);
+            }
             return params.join('&');
         } 
         var googleUrl = 'https://news.google.com/news/feeds';
@@ -93,4 +95,4 @@ var app = (function () {
     return {
         init: init
     };
-})();
+})($,L);
