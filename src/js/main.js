@@ -11,7 +11,7 @@ var app = (function ($,L) {
                     addListItem(index, this);
                 }
             });
-            sortByDate($('li'),$('articlelist'));
+            sortByDate($('li'),$('#articlelist'));
 
             $('#articlelist li').click(function(e) {
                 previousActiveMarker = markerMap[$('li.active').attr('id')];  
@@ -39,11 +39,16 @@ var app = (function ($,L) {
         });
     }
     function sortByDate(list,div) {
-        list.sort(function(a,b) {
-            return new Date($(a).attr('datetime')) - new Date($(b).attr('datetime'));
-        }).each(function() {
-            div.prepend(this);
-        }); 
+        if(list.length && div.length) {
+            list.sort(function(a,b) {
+                return new Date($(a).attr('datetime')) - new Date($(b).attr('datetime'));
+            }).each(function() {
+                div.prepend(this);
+            }); 
+        }
+        else {
+            throw new Error('Invalid list and target div');
+        }
     }
     function buildRSSUrl() {
         function buildQueryString(data) {
@@ -93,6 +98,7 @@ var app = (function ($,L) {
         $('#articlelist').append(newListItem);
     }
     return {
-        init: init
+        init: init,
+        sortByDate: sortByDate
     };
 })($,L);
