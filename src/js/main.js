@@ -1,9 +1,19 @@
 var app = (function ($,L) {
-    var map;
-    var markerMap = {};
-    var markersList = [];
+    var _map;
+    var _markers;
+    var _markerMap = {};
+    var _markersList = [];
+    var _activeIcon; 
+
     function init() {
-        map = L.mapbox.map('map', 'sharkins.map-uwias8cf',{maxZoom:12});
+        _map = L.mapbox.map('map', 'sharkins.map-uwias8cf',{maxZoom:12});
+        _activeIcon = new L.Icon.Default({iconUrl: 
+                                        './images/marker-icon-red.png'});
+        _markers = new L.MarkerClusterGroup({
+            spiderfyDistanceMultiplier:1, 
+            showCoverageOnHover:false
+        });
+
         $.ajax(buildRSSUrl()).done(function(xml) {
             $(xml).find('item').each(function(index){
                 if ($(this).children('geo\\:long').length > 0){
@@ -12,36 +22,29 @@ var app = (function ($,L) {
                 }
             });
             sortByDate($('li'),$('#articlelist'));
-
-            $('#articlelist li').click(function(e) {
-                previousActiveMarker = markerMap[$('li.active').attr('id')];  
-                if (previousActiveMarker) {
-                    previousActiveMarker.setIcon(new L.Icon.Default());
-                }
-                $('li.active').removeClass('active');
-                $(this).addClass('active');
-                activeMarker = markerMap[$(this).attr('id')];
-                markers.zoomToShowLayer(activeMarker, function(){
-                    activeMarker.setIcon(activeIcon);
-                });    
-            });
-
-            var activeIcon = new L.Icon.Default({
-                iconUrl: './images/marker-icon-red.png'
-            });
-
-            var markers = new L.MarkerClusterGroup({
-                spiderfyDistanceMultiplier:1, 
-                showCoverageOnHover:false
-            });
-            markers.addLayers(markersList);
-            map.addLayer(markers);
+            $('#articlelist li').on('click', articleClick);
+            
+            _markers.addLayers(_markersList);
+            _map.addLayer(_markers);
         });
+    }
+    function articleClick(e) {
+        previousActiveMarker = _markerMap[$('li.active').attr('id')];  
+        if (previousActiveMarker) {
+            previousActiveMarker.setIcon(new L.Icon.Default());
+        }
+        $('li.active').removeClass('active');
+        $(this).addClass('active');
+        activeMarker = _markerMap[$(this).attr('id')];
+        _markers.zoomToShowLayer(activeMarker, function(){
+            activeMarker.setIcon(_activeIcon);
+        });    
     }
     function sortByDate(list,div) {
         if(list.length && div.length) {
             list.sort(function(a,b) {
-                return new Date($(a).attr('datetime')) - new Date($(b).attr('datetime'));
+                return new Date($(a).attr('datetime')) - 
+                    new Date($(b).attr('datetime'));
             }).each(function() {
                 div.prepend(this);
             }); 
@@ -81,11 +84,13 @@ var app = (function ($,L) {
         return geonamesUrl;
     }
     function createFeature(index,xmlitem) {
-        var latlng = new L.LatLng(parseFloat($(xmlitem).children('geo\\:lat').text()),
-                                  parseFloat($(xmlitem).children('geo\\:long').text())); 
+        var latlng = new L.LatLng(parseFloat($(xmlitem)
+                                             .children('geo\\:lat').text()),
+                                  parseFloat($(xmlitem)
+                                             .children('geo\\:long').text())); 
                                   var marker = L.marker(latlng);
-                                  markersList.push(marker);
-                                  markerMap[index] = marker;
+                                  _markersList.push(marker);
+                                  _markerMap[index] = marker;
     }
     function addListItem(index, xmlitem) {
         var articleTitle = $(xmlitem).children('title').text(); 
@@ -99,6 +104,7 @@ var app = (function ($,L) {
     }
     return {
         init: init,
-        sortByDate: sortByDate
+        sortByDate: sortByDate,
+        createFeature: createFeature
     };
 })($,L);
