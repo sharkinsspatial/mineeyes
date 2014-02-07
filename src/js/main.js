@@ -16,9 +16,10 @@ var app = (function ($,L) {
 
         $.ajax(buildRSSUrl()).done(function(xml) {
             $(xml).find('item').each(function(index){
-                if ($(this).children('geo\\:long').length > 0){
-                    createFeature(index,this);
-                    addListItem(index, this);
+                var $xmlitem = $(this);
+                if ($xmlitem.children('geo\\:long').length > 0){
+                    createFeature(index, $xmlitem);
+                    addListItem(index, $xmlitem);
                 }
             });
             sortByDate($('li'),$('#articlelist'));
@@ -83,18 +84,18 @@ var app = (function ($,L) {
         geonamesUrl = geonamesUrl + '?' + buildQueryString(geonamesParams);
         return geonamesUrl;
     }
-    function createFeature(index,xmlitem) {
-        var latlng = new L.LatLng(parseFloat($(xmlitem)
+    function createFeature(index,$xmlitem) {
+        var latlng = new L.LatLng(parseFloat($xmlitem
                                              .children('geo\\:lat').text()),
-                                  parseFloat($(xmlitem)
+                                  parseFloat($xmlitem
                                              .children('geo\\:long').text())); 
                                   var marker = L.marker(latlng);
                                   _markersList.push(marker);
                                   _markerMap[index] = marker;
     }
-    function addListItem(index, xmlitem) {
-        var articleTitle = $(xmlitem).children('title').text(); 
-        var pubdate = new Date($(xmlitem).children('pubDate').text());
+    function addListItem(index, $xmlitem) {
+        var articleTitle = $xmlitem.children('title').text(); 
+        var pubdate = new Date($xmlitem.children('pubDate').text());
         var newListItem = $('<li/>', {
             html: articleTitle,
             'id': index,
