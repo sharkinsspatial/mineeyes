@@ -18,7 +18,7 @@ var app = (function ($,L) {
             $(xml).find('item').each(function(index){
                 var xmlitem = $(this);
                 if (xmlitem.children('geo\\:long').length > 0){
-                    createFeature(index, xmlitem);
+                    createFeature(index, xmlitem, _markerList, _markerMap);
                     addListItem(index, xmlitem, articleList);
                 }
             });
