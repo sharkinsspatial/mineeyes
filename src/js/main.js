@@ -2,7 +2,7 @@ var app = (function ($,L) {
     var _map;
     var _markers;
     var _markerMap = {};
-    var _markersList = [];
+    var _markerList = [];
     var _activeIcon; 
 
     function init() {
@@ -26,7 +26,7 @@ var app = (function ($,L) {
             sortByDate(listItems, articleList);
             listItems.on('click', articleClick);
             
-            _markers.addLayers(_markersList);
+            _markers.addLayers(_markerList);
             _map.addLayer(_markers);
         });
     }
@@ -72,7 +72,7 @@ var app = (function ($,L) {
             um: 1,
             ie: 'UTF-8',
             output: 'rss',
-            num: 200
+            num: 40
         }; 
         var encodedGoogleUrl = encodeURIComponent(googleUrl + '?' + 
                                                   buildQueryString(googleParams));
@@ -87,14 +87,14 @@ var app = (function ($,L) {
         geonamesUrl = geonamesUrl + '?' + buildQueryString(geonamesParams);
         return geonamesUrl;
     }
-    function createFeature(index, xmlitem) {
+    function createFeature(index, xmlitem, markerList, markerMap) {
         var latlng = new L.LatLng(parseFloat(xmlitem
                                              .children('geo\\:lat').text()),
                                   parseFloat(xmlitem
                                              .children('geo\\:long').text())); 
                                   var marker = L.marker(latlng);
-                                  _markersList.push(marker);
-                                  _markerMap[index] = marker;
+                                  markerList.push(marker);
+                                  markerMap[index] = marker;
     }
     function addListItem(index, xmlitem, articleList) {
         var articleTitle = xmlitem.children('title').text(); 

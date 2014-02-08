@@ -22,4 +22,23 @@ describe('sortByDate', function() {
                                   .attr('datetime'));
     });
 });
-
+describe('createFeature', function() {
+    var markerList;
+    var markerMap;
+    var xmlItem;
+    beforeEach(function() {
+        markerList = [];
+        markerMap = {};
+        var xml = '<item><geo:lat xmlns:geo="test">5.1</geo:lat>' + 
+            '<geo:long xmlns:geo="test">1.4</geo:long></item>';
+        var xmlDocument = $.parseXML(xml);
+        xmlItem = $(xmlDocument).find('item');
+    });
+    it('should add marker to markerList array', function() { 
+        app.createFeature(0, xmlItem, markerList, markerMap);
+        expect(markerList.length).toEqual(1);
+    });
+    it('should throw error with null xmlItem', function() {
+        expect(app.createFeature.bind(0, null)).toThrow();
+    });
+});
