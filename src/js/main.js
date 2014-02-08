@@ -114,14 +114,26 @@ var app = (function ($, L, document) {
                                   markerMap[index] = marker;
     }
     function addListItem(index, xmlitem, articleList) {
-        var articleTitle = xmlitem.children('title').text(); 
+        var titleComponents = xmlitem
+                                .children('title')
+                                .text()
+                                .split(' - '); 
+        var articleTitle = titleComponents[0];
+        var articleOrigin = titleComponents[1];
         var pubdate = new Date(xmlitem.children('pubDate').text());
-        var newListItem = $('<li/>', {
+        var articleOriginUrl = xmlitem.children('link').text();
+        var listItem = $('<li/>', {
             html: articleTitle,
             'id': index,
             'datetime': pubdate  
         });
-        articleList.append(newListItem);
+        var itemLink = $('<a/>', {
+            html: articleOrigin,
+            'href': articleOriginUrl,
+            'target': '_blank'
+        });
+        listItem.append(itemLink);
+        articleList.append(listItem);
     }
     return {
         init: init,
