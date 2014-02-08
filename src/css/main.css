@@ -20,6 +20,10 @@ html, body {
     clear: both;
     background-color: blue;
 }
+#ajaxloader {
+    display: block;
+    margin: 0 auto;
+}
 ul {
     padding: 0;
 }

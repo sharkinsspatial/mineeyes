@@ -1,4 +1,4 @@
-var app = (function ($,L) {
+var app = (function ($, L, document) {
     var _map;
     var _markers;
     var _markerMap = {};
@@ -13,6 +13,14 @@ var app = (function ($,L) {
             spiderfyDistanceMultiplier:1, 
             showCoverageOnHover:false
         });
+        $(document)
+            .hide()
+            .ajaxStart(function() {
+                $('#ajaxloader').show();
+            })
+            .ajaxStop(function() {
+                $('ajaxloader').hide();
+            });
         var articleList = $('#articlelist');
         $.ajax(buildRSSUrl()).done(function(xml) {
             $(xml).find('item').each(function(index){
@@ -111,4 +119,4 @@ var app = (function ($,L) {
         sortByDate: sortByDate,
         createFeature: createFeature
     };
-})($,L);
+})($, L, this.document);
