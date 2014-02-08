@@ -13,30 +13,39 @@ var app = (function ($, L, document) {
             spiderfyDistanceMultiplier:1, 
             showCoverageOnHover:false
         });
+
         $(document)
             .hide()
             .ajaxStart(function() {
                 $('#ajaxloader').show();
             })
             .ajaxStop(function() {
-                $('ajaxloader').hide();
+                $('#ajaxloader').hide();
             });
-        var articleList = $('#articlelist');
-        $.ajax(buildRSSUrl()).done(function(xml) {
-            $(xml).find('item').each(function(index){
-                var xmlitem = $(this);
-                if (xmlitem.children('geo\\:long').length > 0){
-                    createFeature(index, xmlitem, _markerList, _markerMap);
-                    addListItem(index, xmlitem, articleList);
-                }
-            });
-            var listItems = $('#articlelist li');
-            sortByDate(listItems, articleList);
-            listItems.on('click', articleClick);
-            
-            _markers.addLayers(_markerList);
-            _map.addLayer(_markers);
+
+        $.ajax(buildRSSUrl())
+            .done(function(xml) {
+                var articleList = processRSSXML(xml);
+                var listItems = $('#articlelist li');
+                sortByDate(listItems, articleList);
+                listItems.on('click', articleClick);
+                _markers.addLayers(_markerList);
+                _map.addLayer(_markers);
         });
+    }
+    function processRSSXML(xml) {
+        var articleList = $('<ul/>', {'id': 'articlelist'});
+        $('#articles').append(articleList);
+        $(xml)
+            .find('item')
+                .each(function(index) {
+                    var xmlitem = $(this);
+                    if (xmlitem.children('geo\\:long').length > 0) {
+                        createFeature(index, xmlitem, _markerList, _markerMap);
+                        addListItem(index, xmlitem, articleList);
+                    }
+                 });
+        return articleList;
     }
     function articleClick(e) {
         var previousActiveLi = $('li.active');
