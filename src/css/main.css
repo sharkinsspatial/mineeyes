@@ -46,7 +46,7 @@ li:last-child {
 li:hover {
     background-color: #E4DADA; 
 }
-ul li.active {
+li.active {
     background-color: #cb2944;
 }
 li span {
@@ -56,7 +56,7 @@ li span {
     padding-top: 10px;
 }
 li:hover a {
-    color: #918282;
+    color: #756C6C;
 }
 li.active a {
     color: #000000;
