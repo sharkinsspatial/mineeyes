@@ -16,12 +16,12 @@ html, body {
     height: 90%;
     float: right;
     overflow: auto;
-    background-color: #3c4e5a;    
+    background-color: #f4f4f4;    
 }
 #footer {
     height: 10%;
     clear: both;
-    background-color: blue;
+    background-color: #E4DADA;
 }
 #ajaxloader {
     padding: 5px;
@@ -34,24 +34,42 @@ ul {
 li {
     padding: 5px 15px 5px 15px;
     list-style: none;
-    color: #FFF;
     cursor: pointer;
     overflow: hidden;
+    border-bottom-style: solid;
+    border-bottom-color: #B9C0C5;
+    border-bottom-width: 1px;
+}
+li:last-child {
+    border-bottom-width: 0px;
 }
 li:hover {
-    background-color: #369; 
+    background-color: #E4DADA; 
 }
 ul li.active {
     background-color: #cb2944;
 }
+li span {
+    font-size: 16px;
+    color: #000000;
+    float: left;
+    padding-top: 10px;
+}
+li:hover a {
+    color: #918282;
+}
+li.active a {
+    color: #000000;
+}
 li a {
     font-size: 80%;
+    color: #999;
+    text-decoration: none;
     float: right;
     clear: left;
     margin-top: 5px;
 }
-li span {
-    font-size: 16px;
-    color: #f4f4f4;
-    float: left;
+li a:hover {
+    text-decoration: underline;
 }
+
