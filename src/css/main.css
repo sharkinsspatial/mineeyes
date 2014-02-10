@@ -2,6 +2,9 @@ html, body {
     margin: 0;
     padding: 0;
     height: 100%;
+    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", 
+        "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; 
+    font-weight: 2200;
 }
 #map {
     width: 80%;
@@ -25,25 +28,30 @@ html, body {
     display: block;
     margin: 0 auto;
 }
-li a {
-    padding-top: 3px;
-    display: block;
-    margin: 0 auto;
-}
 ul {
     padding: 0;
 }
 li {
-    padding:5px 20px;
+    padding: 5px 15px 5px 15px;
     list-style: none;
     color: #FFF;
     cursor: pointer;
+    overflow: hidden;
 }
 li:hover {
     background-color: #369; 
-    color: #FFF;
 }
 ul li.active {
     background-color: #cb2944;
-    color: #FFF;
+}
+li a {
+    font-size: 80%;
+    float: right;
+    clear: left;
+    margin-top: 5px;
+}
+li span {
+    font-size: 16px;
+    color: #f4f4f4;
+    float: left;
 }

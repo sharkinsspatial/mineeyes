@@ -122,8 +122,11 @@ var app = (function ($, L, document) {
         var articleOrigin = titleComponents[1];
         var pubdate = new Date(xmlitem.children('pubDate').text());
         var articleOriginUrl = xmlitem.children('link').text();
+        var articleSpan = $('<span/>', {
+            html: articleTitle
+        });
         var listItem = $('<li/>', {
-            html: articleTitle,
+            html: articleSpan,
             'id': index,
             'datetime': pubdate  
         });
