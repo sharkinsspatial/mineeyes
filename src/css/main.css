@@ -21,7 +21,8 @@ html, body {
 #footer {
     height: 10%;
     clear: both;
-    background-color: #E4DADA;
+    background: linear-gradient(to right, #cb2944, #f4f4f4);
+    /*background-color: #E4DADA;*/
 }
 #ajaxloader {
     padding: 5px;

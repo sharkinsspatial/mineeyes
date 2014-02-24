@@ -4,9 +4,15 @@ var app = (function ($, L, document) {
     var _markerMap = {};
     var _markerList = [];
     var _activeIcon; 
+    var _mapboxId = 'sharkins.map-uwias8cf';
 
     function init() {
-        _map = L.mapbox.map('map', 'sharkins.map-uwias8cf',{maxZoom:12});
+        _map = L.mapbox.map('map', _mapboxId, {maxZoom:12});
+        _map.on('ready', function() {
+            var miniMap = new L.Control.MiniMap(L.mapbox.tileLayer(
+                _mapboxId), {position: 'bottomleft'})
+                .addTo(_map);
+        });
         _activeIcon = new L.Icon.Default({iconUrl: 
                                         './images/marker-icon-red.png'});
         _markers = new L.MarkerClusterGroup({
