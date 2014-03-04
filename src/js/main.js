@@ -4,6 +4,7 @@ var app = (function ($, L, document) {
     var _markerMap = {};
     var _markerList = [];
     var _activeIcon; 
+    var _defaultIcon;
 
     function init() {
         _map = L.mapbox.map('map', 'sharkins.map-uwias8cf', {maxZoom:12});
@@ -12,6 +13,7 @@ var app = (function ($, L, document) {
                 'sharkins.hc52c67l'), {position: 'bottomleft'})
                 .addTo(_map);
         });
+        _defaultIcon = new L.Icon.Default();
         _activeIcon = new L.Icon.Default({iconUrl: 
                                         './images/marker-icon-red.png'});
         _markers = new L.MarkerClusterGroup({
@@ -53,18 +55,33 @@ var app = (function ($, L, document) {
         return articleList;
     }
     function articleClick(e) {
-        var previousActiveLi = $('li.active');
-        previousActiveMarker = _markerMap[previousActiveLi.attr('id')];  
-        if (previousActiveMarker) {
-            previousActiveMarker.setIcon(new L.Icon.Default());
-        }
-        previousActiveLi.removeClass('active');
+        clearActive();
         var activeLi = $(this);
         activeLi.addClass('active');
         activeMarker = _markerMap[activeLi.attr('id')];
         _markers.zoomToShowLayer(activeMarker, function(){
             activeMarker.setIcon(_activeIcon);
         });    
+    }
+    function markerClick(e) {
+        clearActive();
+        var articles = $('#articles');
+        var activeLi = $('#articlelist' + ' #' + this.options.id);
+        articles.scrollTop(0);
+        articles.animate({
+            duration: 'slow',
+            scrollTop: activeLi.position().top
+        });
+        activeLi.addClass('active');
+        this.setIcon(_activeIcon);
+    }
+    function clearActive() {
+        var previousActiveLi = $('li.active');
+        previousActiveMarker = _markerMap[previousActiveLi.attr('id')];  
+        if (previousActiveMarker) {
+            previousActiveMarker.setIcon(_defaultIcon);
+        }
+        previousActiveLi.removeClass('active');
     }
     function sortByDate(listItems, list) {
         if(listItems.length && list.length) {
@@ -114,7 +131,8 @@ var app = (function ($, L, document) {
                                              .children('geo\\:lat').text()),
                                   parseFloat(xmlitem
                                              .children('geo\\:long').text())); 
-                                  var marker = L.marker(latlng);
+                                  var marker = L.marker(latlng, {id: index});
+                                  marker.on('click', markerClick);
                                   markerList.push(marker);
                                   markerMap[index] = marker;
     }
