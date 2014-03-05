@@ -7,6 +7,7 @@ var app = (function ($, L, document) {
     var _defaultIcon;
 
     function init() {
+        articleList.init();
         _map = L.mapbox.map('map', 'sharkins.map-uwias8cf', {maxZoom:12});
         _map.on('ready', function() {
             var miniMap = new L.Control.MiniMap(L.mapbox.tileLayer(
@@ -32,37 +33,24 @@ var app = (function ($, L, document) {
 
         $.ajax(buildRSSUrl())
             .done(function(xml) {
-                var articleList = processRSSXML(xml);
-                var listItems = $('#articlelist li');
-                sortByDate(listItems, articleList);
-                listItems.on('click', articleClick);
+                processRSSXML(xml);
                 _markers.addLayers(_markerList);
                 _map.addLayer(_markers);
         });
     }
     function processRSSXML(xml) {
-        var articleList = $('<ul/>', {'id': 'articlelist'});
-        $('#articles').append(articleList);
         $(xml)
             .find('item')
                 .each(function(index) {
                     var xmlitem = $(this);
                     if (xmlitem.children('geo\\:long').length > 0) {
                         createFeature(index, xmlitem, _markerList, _markerMap);
-                        addListItem(index, xmlitem, articleList);
+                        articleList.addListItem(index, xmlitem);
                     }
                  });
-        return articleList;
+        articleList.sortByDate();
     }
-    function articleClick(e) {
-        clearActive();
-        var activeLi = $(this);
-        activeLi.addClass('active');
-        activeMarker = _markerMap[activeLi.attr('id')];
-        _markers.zoomToShowLayer(activeMarker, function(){
-            activeMarker.setIcon(_activeIcon);
-        });    
-    }
+    
     function markerClick(e) {
         clearActive();
         var articles = $('#articles');
@@ -82,20 +70,7 @@ var app = (function ($, L, document) {
             previousActiveMarker.setIcon(_defaultIcon);
         }
         previousActiveLi.removeClass('active');
-    }
-    function sortByDate(listItems, list) {
-        if(listItems.length && list.length) {
-            listItems.sort(function(a,b) {
-                return new Date($(a).attr('datetime')) - 
-                    new Date($(b).attr('datetime'));
-            }).each(function() {
-                list.prepend(this);
-            }); 
-        }
-        else {
-            throw new Error('Invalid list and target div');
-        }
-    }
+    } 
     function buildRSSUrl() {
         function buildQueryString(data) {
             var params = [];
@@ -135,35 +110,75 @@ var app = (function ($, L, document) {
                                   marker.on('click', markerClick);
                                   markerList.push(marker);
                                   markerMap[index] = marker;
-    }
-    function addListItem(index, xmlitem, articleList) {
-        var titleComponents = xmlitem
-                                .children('title')
-                                .text()
-                                .split(' - '); 
-        var articleTitle = titleComponents[0];
-        var articleOrigin = titleComponents[1];
-        var pubdate = new Date(xmlitem.children('pubDate').text());
-        var articleOriginUrl = xmlitem.children('link').text();
-        var articleSpan = $('<span/>', {
-            html: articleTitle
-        });
-        var listItem = $('<li/>', {
-            html: articleSpan,
-            'id': index,
-            'datetime': pubdate  
-        });
-        var itemLink = $('<a/>', {
-            html: articleOrigin,
-            'href': articleOriginUrl,
-            'target': '_blank'
-        });
-        listItem.append(itemLink);
-        articleList.append(listItem);
-    }
+    } 
+    var articleList = (function ($) {
+        var _list;
+        function init() {
+            _list = $('<ul/>', {'id': 'articlelist'});
+            $('#articles').append(_list);
+        }
+
+        function addListItem(index, xmlitem) {
+            var titleComponents = xmlitem
+                                    .children('title')
+                                    .text()
+                                    .split(' - '); 
+            var articleTitle = titleComponents[0];
+            var articleOrigin = titleComponents[1];
+            var pubdate = new Date(xmlitem.children('pubDate').text());
+            var articleOriginUrl = xmlitem.children('link').text();
+            var articleSpan = $('<span/>', {
+                html: articleTitle
+            });
+            var listItem = $('<li/>', {
+                html: articleSpan,
+                'id': index,
+                'datetime': pubdate  
+            });
+            var itemLink = $('<a/>', {
+                html: articleOrigin,
+                'href': articleOriginUrl,
+                'target': '_blank'
+            });
+            listItem.on('click', articleClick);
+            listItem.append(itemLink);
+            _list.append(listItem);
+        }
+
+        function sortByDate() {
+            var listItems = $('#articlelist li');
+            var list = _list;
+            if(listItems.length && list.length) {
+                listItems.sort(function(a,b) {
+                    return new Date($(a).attr('datetime')) - 
+                        new Date($(b).attr('datetime'));
+                }).each(function() {
+                    list.prepend(this);
+                }); 
+            }
+            else {
+                throw new Error('Invalid list and target div');
+            }
+        }
+        function articleClick(e) {
+                clearActive();
+                var activeLi = $(this);
+                activeLi.addClass('active');
+                activeMarker = _markerMap[activeLi.attr('id')];
+                _markers.zoomToShowLayer(activeMarker, function(){
+                    activeMarker.setIcon(_activeIcon);
+                });
+        }
+
+        return {
+            init: init,
+            addListItem: addListItem,
+            sortByDate: sortByDate
+        };
+    })($);
+
     return {
         init: init,
-        sortByDate: sortByDate,
         createFeature: createFeature
     };
 })($, L, this.document);
