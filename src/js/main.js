@@ -1,25 +1,12 @@
 var app = (function ($, L, document) {
-    var _map;
-    var _markers;
-    var _markerMap = {};
-    var _markerList = [];
-    var _activeIcon; 
-    var _defaultIcon;
-
     function init() {
         articleList.init();
-        _map = L.mapbox.map('map', 'sharkins.map-uwias8cf', {maxZoom:12});
-        _map.on('ready', function() {
+        articleMarkers.init();
+        var map = L.mapbox.map('map', 'sharkins.map-uwias8cf', {maxZoom:12});
+        map.on('ready', function() {
             var miniMap = new L.Control.MiniMap(L.mapbox.tileLayer(
                 'sharkins.hc52c67l'), {position: 'bottomleft'})
-                .addTo(_map);
-        });
-        _defaultIcon = new L.Icon.Default();
-        _activeIcon = new L.Icon.Default({iconUrl: 
-                                        './images/marker-icon-red.png'});
-        _markers = new L.MarkerClusterGroup({
-            spiderfyDistanceMultiplier:1, 
-            showCoverageOnHover:false
+                .addTo(map);
         });
 
         $(document)
@@ -34,8 +21,7 @@ var app = (function ($, L, document) {
         $.ajax(buildRSSUrl())
             .done(function(xml) {
                 processRSSXML(xml);
-                _markers.addLayers(_markerList);
-                _map.addLayer(_markers);
+                map.addLayer(articleMarkers.getMarkerLayer());
         });
         $(document).on('articleMarkerClick', function(e, id) {
             articleList.scrollToArticle(id);
@@ -47,40 +33,20 @@ var app = (function ($, L, document) {
             articleMarkers.activateMarker(id);
         });
     }
+
     function processRSSXML(xml) {
         $(xml)
             .find('item')
                 .each(function(index) {
                     var xmlitem = $(this);
                     if (xmlitem.children('geo\\:long').length > 0) {
-                        articleMarkers.createMarker(
-                            index, xmlitem, _markerList, _markerMap);
+                        articleMarkers.addMarker(index, xmlitem);
                         articleList.addListItem(index, xmlitem);
                     }
                  });
         articleList.sortByDate();
     }
-    
-    //function markerClick(e) {
-        //clearActive();
-        //var articles = $('#articles');
-        //var activeLi = $('#articlelist' + ' #' + this.options.id);
-        //articles.scrollTop(0);
-        //articles.animate({
-            //duration: 'slow',
-            //scrollTop: activeLi.position().top
-        //});
-        //activeLi.addClass('active');
-        //this.setIcon(_activeIcon);
-    //}
-    //function clearActive() {
-        //var previousActiveLi = $('li.active');
-        //previousActiveMarker = _markerMap[previousActiveLi.attr('id')];  
-        //if (previousActiveMarker) {
-            //previousActiveMarker.setIcon(_defaultIcon);
-        //}
-        //previousActiveLi.removeClass('active');
-    //} 
+
     function buildRSSUrl() {
         function buildQueryString(data) {
             var params = [];
@@ -104,49 +70,79 @@ var app = (function ($, L, document) {
         var geonamesParams = {
             feedUrl: encodedGoogleUrl,
             username: 'sharkinsgis',
-            feedLanguage: 'en',
-            country: 'pe',
+            feedLanguage: 'en', country: 'pe',
             addUngeocodedItems: 'false'
         };
         geonamesUrl = geonamesUrl + '?' + buildQueryString(geonamesParams);
         return geonamesUrl;
     }
      
-    var articleMarkers = (function ($, document) {
-        function createMarker(index, xmlitem, markerList, markerMap) {
+    var articleMarkers = (function () {
+        var _markerMap;
+        var _markerList;
+        var _defaultIcon;
+        var _activeIcon;
+        var _markers;
+
+        function init() {
+            _markerMap = {};
+            _markerList = [];
+            _defaultIcon = new L.Icon.Default();
+            _activeIcon = new L.Icon.Default({iconUrl: 
+                                             './images/marker-icon-red.png'});
+            _markers = new L.MarkerClusterGroup(
+                {spiderfyDistanceMultiplier:1, showCoverageOnHover:false}
+            );
+        }
+
+        function addMarker(index, xmlitem) {
             var latlng = new L.LatLng(parseFloat(xmlitem
                                                  .children('geo\\:lat').text()),
                                                  parseFloat(xmlitem.
                                                  children('geo\\:long').text()));
             var marker = L.marker(latlng, {id: index});
-            //marker.on('click', markerClick);
             marker.on('click', function() {
                 this.setIcon(_activeIcon);
                 $(document).trigger('articleMarkerClick', [this.options.id]);
             }); 
-            markerList.push(marker);
-            markerMap[index] = marker;
-        }        
+            _markerList.push(marker);
+            _markerMap[index] = marker;
+        }
+        
+        function getMarkerLayer() {
+            _markers.addLayers(_markerList);
+            return _markers;
+        }
+        
         function activateMarker(id) {
             var activeMarker = _markerMap[id];
             _markers.zoomToShowLayer(activeMarker, function(){
                 activeMarker.setIcon(_activeIcon);
             });
         }
+
         function deactivateMarker(id) {
             var previousActiveMarker = _markerMap[id];  
             if (previousActiveMarker) {
                 previousActiveMarker.setIcon(_defaultIcon);
             }
         }
-        return {
-            createMarker: createMarker,
-            activateMarker: activateMarker,
-            deactivateMarker: deactivateMarker
-        };
-    })($, document);
+        
+        function getMarkerList() {
+            return _markerList;
+        }
 
-    var articleList = (function ($, document) {
+        return {
+            init: init,
+            addMarker: addMarker,
+            getMarkerLayer: getMarkerLayer,
+            activateMarker: activateMarker,
+            deactivateMarker: deactivateMarker,
+            getMarkerList: getMarkerList
+        };
+    })();
+
+    var articleList = (function () {
         var _list;
         function init() {
             _list = $('<ul/>', {'id': 'articlelist'});
@@ -195,12 +191,14 @@ var app = (function ($, L, document) {
                 throw new Error('Invalid list and target div');
             }
         }
+
         function deactivatePreviousArticle() {
             var previousActiveLi = $('li.active');
             $(document).trigger('articleDeactivated', 
                                 [previousActiveLi.attr('id')]);
             previousActiveLi.removeClass('active');
         }
+        
         function scrollToArticle(id) {
             deactivatePreviousArticle();
             var articles = $('#articles');
@@ -212,15 +210,12 @@ var app = (function ($, L, document) {
                 scrollTop: activeLi.position().top
             });
         }
+
         function articleClick(e) { 
             deactivatePreviousArticle();
             var activeLi = $(this);
             activeLi.addClass('active');
             $(document).trigger('articleActivated', [activeLi.attr('id')]);
-            //activeMarker = _markerMap[activeLi.attr('id')];
-            //_markers.zoomToShowLayer(activeMarker, function(){
-                //activeMarker.setIcon(_activeIcon);
-            //});
         }
 
         return {
@@ -229,7 +224,7 @@ var app = (function ($, L, document) {
             sortByDate: sortByDate,
             scrollToArticle: scrollToArticle
         };
-    })($, document);
+    })();
 
     return {
         init: init
