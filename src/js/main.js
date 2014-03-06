@@ -37,6 +37,15 @@ var app = (function ($, L, document) {
                 _markers.addLayers(_markerList);
                 _map.addLayer(_markers);
         });
+        $(document).on('articleMarkerClick', function(e, id) {
+            articleList.scrollToArticle(id);
+        });
+        $(document).on('articleDeactivated', function(e, id) {
+            articleMarkers.deactivateMarker(id);
+        });
+        $(document).on('articleActivated', function(e, id) { 
+            articleMarkers.activateMarker(id);
+        });
     }
     function processRSSXML(xml) {
         $(xml)
@@ -44,33 +53,34 @@ var app = (function ($, L, document) {
                 .each(function(index) {
                     var xmlitem = $(this);
                     if (xmlitem.children('geo\\:long').length > 0) {
-                        createFeature(index, xmlitem, _markerList, _markerMap);
+                        articleMarkers.createMarker(
+                            index, xmlitem, _markerList, _markerMap);
                         articleList.addListItem(index, xmlitem);
                     }
                  });
         articleList.sortByDate();
     }
     
-    function markerClick(e) {
-        clearActive();
-        var articles = $('#articles');
-        var activeLi = $('#articlelist' + ' #' + this.options.id);
-        articles.scrollTop(0);
-        articles.animate({
-            duration: 'slow',
-            scrollTop: activeLi.position().top
-        });
-        activeLi.addClass('active');
-        this.setIcon(_activeIcon);
-    }
-    function clearActive() {
-        var previousActiveLi = $('li.active');
-        previousActiveMarker = _markerMap[previousActiveLi.attr('id')];  
-        if (previousActiveMarker) {
-            previousActiveMarker.setIcon(_defaultIcon);
-        }
-        previousActiveLi.removeClass('active');
-    } 
+    //function markerClick(e) {
+        //clearActive();
+        //var articles = $('#articles');
+        //var activeLi = $('#articlelist' + ' #' + this.options.id);
+        //articles.scrollTop(0);
+        //articles.animate({
+            //duration: 'slow',
+            //scrollTop: activeLi.position().top
+        //});
+        //activeLi.addClass('active');
+        //this.setIcon(_activeIcon);
+    //}
+    //function clearActive() {
+        //var previousActiveLi = $('li.active');
+        //previousActiveMarker = _markerMap[previousActiveLi.attr('id')];  
+        //if (previousActiveMarker) {
+            //previousActiveMarker.setIcon(_defaultIcon);
+        //}
+        //previousActiveLi.removeClass('active');
+    //} 
     function buildRSSUrl() {
         function buildQueryString(data) {
             var params = [];
@@ -101,17 +111,42 @@ var app = (function ($, L, document) {
         geonamesUrl = geonamesUrl + '?' + buildQueryString(geonamesParams);
         return geonamesUrl;
     }
-    function createFeature(index, xmlitem, markerList, markerMap) {
-        var latlng = new L.LatLng(parseFloat(xmlitem
-                                             .children('geo\\:lat').text()),
-                                  parseFloat(xmlitem
-                                             .children('geo\\:long').text())); 
-                                  var marker = L.marker(latlng, {id: index});
-                                  marker.on('click', markerClick);
-                                  markerList.push(marker);
-                                  markerMap[index] = marker;
-    } 
-    var articleList = (function ($) {
+     
+    var articleMarkers = (function ($, document) {
+        function createMarker(index, xmlitem, markerList, markerMap) {
+            var latlng = new L.LatLng(parseFloat(xmlitem
+                                                 .children('geo\\:lat').text()),
+                                                 parseFloat(xmlitem.
+                                                 children('geo\\:long').text()));
+            var marker = L.marker(latlng, {id: index});
+            //marker.on('click', markerClick);
+            marker.on('click', function() {
+                this.setIcon(_activeIcon);
+                $(document).trigger('articleMarkerClick', [this.options.id]);
+            }); 
+            markerList.push(marker);
+            markerMap[index] = marker;
+        }        
+        function activateMarker(id) {
+            var activeMarker = _markerMap[id];
+            _markers.zoomToShowLayer(activeMarker, function(){
+                activeMarker.setIcon(_activeIcon);
+            });
+        }
+        function deactivateMarker(id) {
+            var previousActiveMarker = _markerMap[id];  
+            if (previousActiveMarker) {
+                previousActiveMarker.setIcon(_defaultIcon);
+            }
+        }
+        return {
+            createMarker: createMarker,
+            activateMarker: activateMarker,
+            deactivateMarker: deactivateMarker
+        };
+    })($, document);
+
+    var articleList = (function ($, document) {
         var _list;
         function init() {
             _list = $('<ul/>', {'id': 'articlelist'});
@@ -160,25 +195,43 @@ var app = (function ($, L, document) {
                 throw new Error('Invalid list and target div');
             }
         }
-        function articleClick(e) {
-                clearActive();
-                var activeLi = $(this);
-                activeLi.addClass('active');
-                activeMarker = _markerMap[activeLi.attr('id')];
-                _markers.zoomToShowLayer(activeMarker, function(){
-                    activeMarker.setIcon(_activeIcon);
-                });
+        function deactivatePreviousArticle() {
+            var previousActiveLi = $('li.active');
+            $(document).trigger('articleDeactivated', 
+                                [previousActiveLi.attr('id')]);
+            previousActiveLi.removeClass('active');
+        }
+        function scrollToArticle(id) {
+            deactivatePreviousArticle();
+            var articles = $('#articles');
+            var activeLi = $('#articlelist' + ' #' + id);
+            activeLi.addClass('active');
+            articles.scrollTop(0);
+            articles.animate({
+                duration: 'slow',
+                scrollTop: activeLi.position().top
+            });
+        }
+        function articleClick(e) { 
+            deactivatePreviousArticle();
+            var activeLi = $(this);
+            activeLi.addClass('active');
+            $(document).trigger('articleActivated', [activeLi.attr('id')]);
+            //activeMarker = _markerMap[activeLi.attr('id')];
+            //_markers.zoomToShowLayer(activeMarker, function(){
+                //activeMarker.setIcon(_activeIcon);
+            //});
         }
 
         return {
             init: init,
             addListItem: addListItem,
-            sortByDate: sortByDate
+            sortByDate: sortByDate,
+            scrollToArticle: scrollToArticle
         };
-    })($);
+    })($, document);
 
     return {
-        init: init,
-        createFeature: createFeature
+        init: init
     };
 })($, L, this.document);
