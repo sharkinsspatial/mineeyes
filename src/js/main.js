@@ -128,17 +128,12 @@ var app = (function ($, L, document) {
             }
         }
         
-        function getMarkerList() {
-            return _markerList;
-        }
-
         return {
             init: init,
             addMarker: addMarker,
             getMarkerLayer: getMarkerLayer,
             activateMarker: activateMarker,
-            deactivateMarker: deactivateMarker,
-            getMarkerList: getMarkerList
+            deactivateMarker: deactivateMarker
         };
     })();
 
