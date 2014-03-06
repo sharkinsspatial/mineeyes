@@ -18,11 +18,8 @@ var app = (function ($, L, document) {
                 $('#ajaxloader').hide();
             });
 
-        $.ajax(buildRSSUrl())
-            .done(function(xml) {
-                processRSSXML(xml);
-                map.addLayer(articleMarkers.getMarkerLayer());
-        });
+        googleNewsSearch.fetchData().then(processRSSXML);
+
         $(document).on('articleMarkerClick', function(e, id) {
             articleList.scrollToArticle(id);
         });
@@ -32,51 +29,62 @@ var app = (function ($, L, document) {
         $(document).on('articleActivated', function(e, id) { 
             articleMarkers.activateMarker(id);
         });
+        
+        function processRSSXML(xml) {
+            $(xml)
+                .find('item')
+                    .each(function(index) {
+                        var xmlitem = $(this);
+                        if (xmlitem.children('geo\\:long').length > 0) {
+                            articleMarkers.addMarker(index, xmlitem);
+                            articleList.addListItem(index, xmlitem);
+                        }
+                     });
+            articleList.sortByDate();
+            map.addLayer(articleMarkers.getMarkerLayer());
+        }
     }
 
-    function processRSSXML(xml) {
-        $(xml)
-            .find('item')
-                .each(function(index) {
-                    var xmlitem = $(this);
-                    if (xmlitem.children('geo\\:long').length > 0) {
-                        articleMarkers.addMarker(index, xmlitem);
-                        articleList.addListItem(index, xmlitem);
-                    }
-                 });
-        articleList.sortByDate();
-    }
+    var googleNewsSearch = (function () {
+        function buildRSSUrl() {
+            function buildQueryString(data) {
+                var params = [];
+                for (var d in data) {
+                    params.push(d + '=' + data[d]);
+                }
+                return params.join('&');
+            } 
+            var googleUrl = 'https://news.google.com/news/feeds';
+            var googleParams = {
+                gl: 'ca',
+                q: 'peru+mining+protests',
+                um: 1,
+                ie: 'UTF-8',
+                output: 'rss',
+                num: 40
+            }; 
+            var encodedGoogleUrl = encodeURIComponent(googleUrl + '?' + 
+                                                      buildQueryString(googleParams));
+            var geonamesUrl = 'http://api.geonames.org/rssToGeoRSS';
+            var geonamesParams = {
+                feedUrl: encodedGoogleUrl,
+                username: 'sharkinsgis',
+                feedLanguage: 'en', country: 'pe',
+                addUngeocodedItems: 'false'
+            };
+            geonamesUrl = geonamesUrl + '?' + buildQueryString(geonamesParams);
+            return geonamesUrl;
+        }
 
-    function buildRSSUrl() {
-        function buildQueryString(data) {
-            var params = [];
-            for (var d in data) {
-                params.push(d + '=' + data[d]);
-            }
-            return params.join('&');
-        } 
-        var googleUrl = 'https://news.google.com/news/feeds';
-        var googleParams = {
-            gl: 'ca',
-            q: 'peru+mining+protests',
-            um: 1,
-            ie: 'UTF-8',
-            output: 'rss',
-            num: 40
-        }; 
-        var encodedGoogleUrl = encodeURIComponent(googleUrl + '?' + 
-                                                  buildQueryString(googleParams));
-        var geonamesUrl = 'http://api.geonames.org/rssToGeoRSS';
-        var geonamesParams = {
-            feedUrl: encodedGoogleUrl,
-            username: 'sharkinsgis',
-            feedLanguage: 'en', country: 'pe',
-            addUngeocodedItems: 'false'
+        function fetchData() {
+            return $.ajax(buildRSSUrl());
+        }
+
+        return {
+            fetchData: fetchData
         };
-        geonamesUrl = geonamesUrl + '?' + buildQueryString(geonamesParams);
-        return geonamesUrl;
-    }
-     
+    })();
+
     var articleMarkers = (function () {
         var _markerMap;
         var _markerList;
