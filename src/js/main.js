@@ -1,7 +1,6 @@
 var app = (function ($, L, document) {
     function init() {
         articleList.init();
-        articleMarkers.init();
         var map = L.mapbox.map('map', 'sharkins.map-uwias8cf', {maxZoom:12});
         map.on('ready', function() {
             var miniMap = new L.Control.MiniMap(L.mapbox.tileLayer(
@@ -86,23 +85,15 @@ var app = (function ($, L, document) {
     })();
 
     var articleMarkers = (function () {
-        var _markerMap;
-        var _markerList;
-        var _defaultIcon;
-        var _activeIcon;
-        var _markers;
-
-        function init() {
-            _markerMap = {};
-            _markerList = [];
-            _defaultIcon = new L.Icon.Default();
-            _activeIcon = new L.Icon.Default({iconUrl: 
+        var _markerMap = {};
+        var _markerList = [];
+        var _defaultIcon = new L.Icon.Default();
+        var _activeIcon = new L.Icon.Default({iconUrl: 
                                              './images/marker-icon-red.png'});
-            _markers = new L.MarkerClusterGroup(
+        var _markers = new L.MarkerClusterGroup(
                 {spiderfyDistanceMultiplier:1, showCoverageOnHover:false}
-            );
-        }
-
+        );
+        
         function addMarker(index, xmlitem) {
             var latlng = new L.LatLng(parseFloat(xmlitem
                                                  .children('geo\\:lat').text()),
@@ -120,6 +111,10 @@ var app = (function ($, L, document) {
         function getMarkerLayer() {
             _markers.addLayers(_markerList);
             return _markers;
+        }
+        
+        function getMarkerList() {
+            return _markerList;
         }
         
         function activateMarker(id) {
@@ -140,15 +135,15 @@ var app = (function ($, L, document) {
             init: init,
             addMarker: addMarker,
             getMarkerLayer: getMarkerLayer,
+            getMarkerList: getMarkerList,
             activateMarker: activateMarker,
             deactivateMarker: deactivateMarker
         };
     })();
 
     var articleList = (function () {
-        var _list;
+        var _list = $('<ul/>', {'id': 'articlelist'});
         function init() {
-            _list = $('<ul/>', {'id': 'articlelist'});
             $('#articles').append(_list);
         }
 
@@ -190,9 +185,6 @@ var app = (function ($, L, document) {
                     list.prepend(this);
                 }); 
             }
-            else {
-                throw new Error('Invalid list and target div');
-            }
         }
 
         function deactivatePreviousArticle() {
@@ -230,6 +222,8 @@ var app = (function ($, L, document) {
     })();
 
     return {
-        init: init
+        init: init,
+        articleList: articleList,
+        articleMarkers: articleMarkers
     };
 })($, L, this.document);
