@@ -132,7 +132,6 @@ var app = (function ($, L, document) {
         }
         
         return {
-            init: init,
             addMarker: addMarker,
             getMarkerLayer: getMarkerLayer,
             getMarkerList: getMarkerList,
