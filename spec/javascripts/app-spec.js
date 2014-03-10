@@ -21,13 +21,52 @@ describe('app.articleList.sortByDate', function() {
 describe('app.articleMarkers.addMarker', function() {
     var xmlItem;
     beforeEach(function() {
-        var xml = '<item><geo:lat xmlns:geo="test">5.1</geo:lat>' + 
-            '<geo:long xmlns:geo="test">1.4</geo:long></item>';
-        var xmlDocument = $.parseXML(xml);
+        var xmlDocument = generateXMLData(true);
         xmlItem = $(xmlDocument).find('item');
     });
     it('should add marker to markerList', function() { 
         app.articleMarkers.addMarker(0, xmlItem);
         expect(app.articleMarkers.getMarkerList().length).toEqual(1);
     });
+    it('should throw error with null xmlItem', function() {
+        expect(app.articleMarkers.addMarker.bind(0, null)).toThrow();
+    });
 });
+
+describe('app.processRSSXML', function() {
+    var xmlDocument;
+    beforeEach(function() {
+        var xmlDocument = generateXMLData(true);
+        spyOn(app.articleMarkers, 'addMarker');
+        app.processRSSXML(xmlDocument);
+    });
+    it('calls articleMarkers.addMarker', function() {
+        expect(app.articleMarkers.addMarker).toHaveBeenCalled();
+    });
+    it('calls articleMarkers.addMarker once for each xml item', function() {
+        expect(app.articleMarkers.addMarker.calls.count()).toEqual(1);
+    }); 
+});
+
+describe('app.processRSSXML with bad values', function() {
+    beforeEach(function() {
+        var xmlDocument = generateXMLData(false);
+        spyOn(app.articleMarkers, 'addMarker');
+        app.processRSSXML(xmlDocument);
+    });
+    it('does not call articleMarkers.addMarker without geo:long', function() {
+        expect(app.articleMarkers.addMarker).not.toHaveBeenCalled();
+    });
+});
+
+function generateXMLData(valid) {
+    var xml;
+    if (valid) {
+        xml = '<item><geo:lat xmlns:geo="test">5.1</geo:lat>' + 
+            '<geo:long xmlns:geo="test">1.4</geo:long></item>';
+    } else {
+        xml = '<item><geo:lat xmlns:geo="test">5.1</geo:lat></item>';
+    }
+    var xmlDocument = $.parseXML(xml);
+    return xmlDocument;
+}
