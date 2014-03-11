@@ -41,7 +41,12 @@ var app = (function ($, L, document) {
                     .each(function(index) {
                         var xmlitem = $(this);
                         if (xmlitem.children('geo\\:long').length > 0) {
-                            articleMarkers.addMarker(index, xmlitem);
+                            var lat = parseFloat(xmlitem
+                                                 .children('geo\\:lat').text());
+                            var lon = parseFloat(xmlitem
+                                                 .children('geo\\:long').text());
+
+                            articleMarkers.addMarker(index, lat, lon);
                             articleList.addListItem(index, xmlitem);
                         }
                      });
@@ -97,11 +102,8 @@ var app = (function ($, L, document) {
                 {spiderfyDistanceMultiplier:1, showCoverageOnHover:false}
         );
         
-        function addMarker(index, xmlitem) {
-            var latlng = new L.LatLng(parseFloat(xmlitem
-                                                 .children('geo\\:lat').text()),
-                                                 parseFloat(xmlitem.
-                                                 children('geo\\:long').text()));
+        function addMarker(index, lat, lon) {
+            var latlng = new L.LatLng(lat, lon);
             var marker = L.marker(latlng, {id: index});
             marker.on('click', function() {
                 this.setIcon(_activeIcon);

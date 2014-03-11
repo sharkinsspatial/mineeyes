@@ -19,25 +19,21 @@ describe('app.articleList.sortByDate', function() {
 });
 
 describe('app.articleMarkers.addMarker', function() {
-    var xmlItem;
-    beforeEach(function() {
-        var xmlDocument = generateXMLData(true);
-        xmlItem = $(xmlDocument).find('item');
-    });
     it('should add marker to markerList', function() { 
-        app.articleMarkers.addMarker(0, xmlItem);
+        app.articleMarkers.addMarker(0, 0, 0);
         expect(app.articleMarkers.getMarkerList().length).toEqual(1);
     });
-    it('should throw error with null xmlItem', function() {
-        expect(app.articleMarkers.addMarker.bind(0, null)).toThrow();
+    it('should throw error with null lat or long', function() {
+        expect(app.articleMarkers.addMarker.bind(0, null, null)).toThrow();
     });
 });
 
 describe('app.processRSSXML', function() {
     var xmlDocument;
     beforeEach(function() {
-        var xmlDocument = generateXMLData(true);
+        xmlDocument = generateXMLData(true);
         spyOn(app.articleMarkers, 'addMarker');
+        spyOn(app.articleList, 'addListItem');
         app.processRSSXML(xmlDocument);
     });
     it('calls articleMarkers.addMarker', function() {
@@ -46,9 +42,20 @@ describe('app.processRSSXML', function() {
     it('calls articleMarkers.addMarker once for each xml item', function() {
         expect(app.articleMarkers.addMarker.calls.count()).toEqual(1);
     }); 
+    it('calls articleMarkers.addMarker and articleList.addListItem with the ' +
+       'same index key', function() {
+        var indexKey = 0;
+        var xmlItem = $($(xmlDocument).find('item').first().get(0));
+        var lat = parseFloat(xmlItem.children('geo\\:lat').text());
+        var lon = parseFloat(xmlItem.children('geo\\:long').text());      
+        expect(app.articleMarkers.addMarker)
+            .toHaveBeenCalledWith(indexKey, lat, lon);
+        expect(app.articleList.addListItem)
+            .toHaveBeenCalledWith(indexKey, xmlItem);
+    });
 });
 
-describe('app.processRSSXML with bad values', function() {
+describe('app.processRSSXML with invalid data', function() {
     beforeEach(function() {
         var xmlDocument = generateXMLData(false);
         spyOn(app.articleMarkers, 'addMarker');
