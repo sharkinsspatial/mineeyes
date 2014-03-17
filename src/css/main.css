@@ -2,6 +2,7 @@ html, body {
     margin: 0;
     padding: 0;
     height: 100%;
+    width: 100%;
     font-family: "HelveticaNeue-Light", "Helvetica Neue Light", 
         "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; 
     font-weight: 2200;
@@ -11,21 +12,8 @@ html, body {
     height: 90%;
     float: left;
 }
-#articles {
-    width: 20%;
-    height: 90%;
-    float: right;
-    overflow: auto;
-    background-color: #f4f4f4;    
-}
-#footer {
-    height: 10%;
-    clear: both;
-    background: linear-gradient(to right, #cb2944, #f4f4f4);
-    /*background-color: #E4DADA;*/
-}
 #ajaxloader {
-    padding: 5px;
+    padding: 1%;
     display: block;
     margin: 0 auto;
 }
@@ -33,16 +21,16 @@ ul {
     padding: 0;
 }
 li {
-    padding: 5px 15px 5px 15px;
+    padding: 2% 3% 3% 4%;
     list-style: none;
     cursor: pointer;
     overflow: hidden;
     border-bottom-style: solid;
     border-bottom-color: #B9C0C5;
-    border-bottom-width: 1px;
+    border-bottom-width: 0.1em;
 }
 li:last-child {
-    border-bottom-width: 0px;
+    border-bottom-width: 0em;
 }
 li:hover {
     background-color: #E4DADA; 
@@ -51,10 +39,10 @@ li.active {
     background-color: #cb2944;
 }
 li span {
-    font-size: 16px;
+   font-size: 1em;
     color: #000000;
     float: left;
-    padding-top: 10px;
+    padding-top: 0.2em;
 }
 li:hover a {
     color: #756C6C;
@@ -68,9 +56,32 @@ li a {
     text-decoration: none;
     float: right;
     clear: left;
-    margin-top: 5px;
+    margin-top: 0.1em;
 }
 li a:hover {
     text-decoration: underline;
 }
-
+#articles {
+    width: 20%;
+    height: 90%;
+    float: right;
+    overflow: auto;
+    background-color: #f4f4f4;    
+}
+#footer {
+    height: 10%;
+    clear: both;
+    background: linear-gradient(to right, #cb2944, #f4f4f4);
+}
+@media (max-width: 750px) { 
+    #articles {
+        display: none;
+    }
+    #footer {
+        display: none;
+    }
+    #map {
+        height: 100%;
+        width: 100%
+    }
+} 
