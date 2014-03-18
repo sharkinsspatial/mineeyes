@@ -19,7 +19,6 @@ var app = (function ($, L, document) {
 
         $('#articlesShow').on('click', function(e) {
             $('#articles').toggleClass('active');
-            $('#map').toggleClass('inactive');
         });
  
         $(document).on('articleMarkerClick', function(e, id) {
@@ -153,11 +152,9 @@ var app = (function ($, L, document) {
     var articleList = (function () {
         var _list = $('<ul/>', {'id': 'articlelist'});
         var _articlesdiv;
-        var _map;
         function init() {
             $('#articles').append(_list);
             _articlesdiv = $('#articles');
-            _map = $('#map');
         }
 
         function addListItem(index, xmlitem) {
@@ -225,8 +222,6 @@ var app = (function ($, L, document) {
             activeLi.addClass('active');
             $(document).trigger('articleActivated', [activeLi.attr('id')]);
             _articlesdiv.toggleClass('active');
-            _map.toggleClass('inactive');
-
         }
 
         return {
