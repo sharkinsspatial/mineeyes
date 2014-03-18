@@ -12,7 +12,7 @@ html, body {
     height: 100%;
     position: absolute;
     top: 0;
-    left: 0;
+    right: 0;
 }
 #articles {
     width: 100%;
@@ -23,6 +23,11 @@ html, body {
     right: -100%;
     background-color: #f4f4f4;
     overflow: auto;
+    -webkit-transition: right 0.5s;
+     -moz-transition: right 0.5s;
+      -ms-transition: right 0.5s;
+       -o-transition: right 0.5s;
+          transition: right 0.5s;
 }
 #ajaxloader {
     padding: 1%;

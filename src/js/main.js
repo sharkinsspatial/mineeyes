@@ -17,8 +17,9 @@ var app = (function ($, L, document) {
                 $('#ajaxloader').hide();
             });
 
-        $('#articlesShow').on('click', function(e) {
+        $('#articlesShow').click(function(e) {
             $('#articles').toggleClass('active');
+            e.stopPropagation();
         });
  
         $(document).on('articleMarkerClick', function(e, id) {
