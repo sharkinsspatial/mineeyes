@@ -7,11 +7,6 @@ html, body {
         "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; 
     font-weight: 2200;
 }
-#map {
-    width: 80%;
-    height: 90%;
-    float: left;
-}
 #ajaxloader {
     padding: 1%;
     display: block;
@@ -61,27 +56,55 @@ li a {
 li a:hover {
     text-decoration: underline;
 }
+#map {
+    height: 100%;
+    width: 100%
+}
 #articles {
-    width: 20%;
+    -webkit-transition: width 0.5s ease-in-out;
+    -moz-transition: width 0.5s ease-in-out;
+    -o-transition: width 0.5s ease-in-out;
+    transition: width 0.5s ease-in-out;
     height: 90%;
+    width: 0%;
     float: right;
     overflow: auto;
-    background-color: #f4f4f4;    
+    background-color: #f4f4f4;
 }
-#footer {
-    height: 10%;
-    clear: both;
-    background: linear-gradient(to right, #cb2944, #f4f4f4);
+#articles.active {
+    height: 100%;
+    width: 100%;
 }
-@media (max-width: 750px) { 
+#map.inactive {
+    height: 0%;
+    width: 0%;
+}
+@media (min-width: 750px) {
     #articles {
-        display: none;
+        width: 20%;        
     }
     #footer {
-        display: none;
+        height: 10%;
+        clear: both;
+        background: linear-gradient(to right, #cb2944, #f4f4f4);
     }
     #map {
-        height: 100%;
-        width: 100%
+        width: 80%;
+        height: 90%;
+        float: left;
     }
-} 
+    #articles.active {
+        width: 20%;
+        height: 90%;
+    }
+    #map.inactive {
+        width: 80%;
+        height: 90%;
+    }
+}
+#articlesShow {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 100;
+}
