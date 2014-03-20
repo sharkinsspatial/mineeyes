@@ -39,6 +39,18 @@ var app = (function ($, L, document) {
             articleList.sortByDate();
             map.addLayer(articleMarkers.getMarkerLayer());
         });
+        
+        $("input[name='radio']").on("change", function () {
+            if (this.id == 'tab-articles') {
+                map.addLayer(articleMarkers.getMarkerLayer());
+            }
+            else if (this.id == 'tab-projects') {
+                map.removeLayer(articleMarkers.getMarkerLayer());
+            }
+            else if (this.id == 'tab-earthquakes') {
+                map.removeLayer(articleMarkers.getMarkerLayer());
+            }
+        });
     }
     
     function processRSSXML(xml) {
@@ -120,7 +132,10 @@ var app = (function ($, L, document) {
         }
         
         function getMarkerLayer() {
-            _markers.addLayers(_markerList);
+            var layers = _markers.getLayers();
+            if (layers.length === 0) {
+                _markers.addLayers(_markerList);
+            }
             return _markers;
         }
         
