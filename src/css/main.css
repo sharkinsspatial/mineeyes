@@ -21,8 +21,7 @@ html, body {
     z-index: 10000;
     top: 0;
     right: -100%;
-    background-color: #f4f4f4;
-    /*overflow: auto;*/
+    background-color: #E4DADA;
     -webkit-transition: right 0.5s;
      -moz-transition: right 0.5s;
       -ms-transition: right 0.5s;
@@ -32,24 +31,6 @@ html, body {
 #sidebar.active {
     right: 0;
 }
-/*#articles {*/
-    /*width: 100%;*/
-    /*height: 100%;*/
-    /*position: absolute;*/
-    /*z-index: 10000;*/
-    /*top: 0;*/
-    /*right: -100%;*/
-    /*background-color: #f4f4f4;*/
-    /*overflow: auto;*/
-    /*-webkit-transition: right 0.5s;*/
-     /*-moz-transition: right 0.5s;*/
-      /*-ms-transition: right 0.5s;*/
-       /*-o-transition: right 0.5s;*/
-          /*transition: right 0.5s;*/
-/*}*/
-/*#articles.active {*/
-    /*right: 0;*/
-/*}*/
 #ajaxloader {
     padding: 1%;
     display: block;
@@ -100,12 +81,6 @@ li a:hover {
     text-decoration: underline;
 }
 @media (min-width: 750px) {
-    /*#articles {*/
-        /*position: static;*/
-        /*width: 20%;*/
-        /*height: 90%;*/
-        /*float: right;*/
-    /*}*/
     #footer {
         height: 10%;
         clear: both;
@@ -123,10 +98,6 @@ li a:hover {
         height: 90%;
         float: right;
     }
-    /*#articles.active {*/
-        /*width: 20%;*/
-        /*height: 90%;*/
-    /*}*/
     #showSidebar {
         visibility: hidden;
     }
@@ -187,31 +158,29 @@ li a:hover {
     float: left;
 }
 .tab label {
-    background: #eee; 
-    padding: 10px; 
-    border: 1px solid #ccc; 
-    margin-left: -1px; 
+    padding: 0.3em; 
+    border: 0.05em solid #B9C0C5; 
+    margin-left: -0.05em; 
     position: relative;
-    left: 1px; 
+    left: 0.05em; 
+    font-size: 2em;
 }
 .tab [type=radio] {
     display: none;   
 }
 .content {
     position: absolute;
-    /*top: 28px;*/
-    top: 10em;
+    top: 2.85em;
     left: 0;
-    background: white;
     right: 0;
     bottom: 0;
-    /*padding: 20px;*/
+    background: #f4f4f4;
     overflow: auto;
-    border: 1px solid #ccc; 
+    border: 0.05em solid #B9C0C5;; 
 }
 [type=radio]:checked ~ label {
-    background: white;
-    border-bottom: 1px solid white;
+    background: #f4f4f4;
+    border-bottom: 0.05em solid #f4f4f4;
     z-index: 2;
 }
 [type=radio]:checked ~ label ~ .content {
