@@ -1,6 +1,7 @@
 var app = (function ($, L, document) {
     function init() {
         articleList.init();
+        projectMarkers.init();
         var map = L.mapbox.map('map', 'sharkins.map-uwias8cf', {maxZoom:12});
         map.on('ready', function() {
             var miniMap = new L.Control.MiniMap(L.mapbox.tileLayer(
@@ -43,12 +44,15 @@ var app = (function ($, L, document) {
         $("input[name='radio']").on("change", function () {
             if (this.id == 'tab-articles') {
                 map.addLayer(articleMarkers.getMarkerLayer());
+                map.removeLayer(projectMarkers.getMarkerLayer());
             }
             else if (this.id == 'tab-projects') {
                 map.removeLayer(articleMarkers.getMarkerLayer());
+                map.addLayer(projectMarkers.getMarkerLayer());
             }
             else if (this.id == 'tab-earthquakes') {
                 map.removeLayer(articleMarkers.getMarkerLayer());
+                map.removeLayer(projectMarkers.getMarkerLayer());
             }
         });
     }
@@ -109,6 +113,42 @@ var app = (function ($, L, document) {
             fetchData: fetchData
         };
     })();
+    
+    var projectMarkers = (function () { 
+        var _list = $('<ul/>', {'id': 'projects'});
+        function init() {
+            $('#projects').append(_list);
+        }
+
+        var projectURL = "http://geocatmin.ingemmet.gob.pe/arcgis/rest/services/SERV_CARTERA_PROYECTOS_MINEROS/MapServer/0";
+        var _markers = new L.MarkerClusterGroup(
+                {spiderfyDistanceMultiplier:1, showCoverageOnHover:false}
+        );
+        
+        function addListItem(geojson) {
+            var listItem = $('<li/>', {
+                html: geojson.properties.EMPRESA,
+                'id': geojson.properties.OBJECTID
+            });
+            _list.append(listItem);
+        }
+
+        var clusteredFeatureLayer = new L.esri.clusteredFeatureLayer(
+            projectURL, {
+                cluster: _markers,
+                onEachMarker: addListItem  
+        });
+
+        function getMarkerLayer() {
+            return clusteredFeatureLayer;
+        }
+
+        return {
+            init: init,
+            getMarkerLayer: getMarkerLayer
+        };
+    })();
+
 
     var articleMarkers = (function () {
         var _markerMap = {};
