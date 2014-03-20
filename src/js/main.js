@@ -17,8 +17,8 @@ var app = (function ($, L, document) {
                 $('#ajaxloader').hide();
             });
 
-        $('#articlesShow').click(function(e) {
-            $('#articles').toggleClass('active');
+        $('#showSidebar').click(function(e) {
+            $('#sidebar').toggleClass('active');
             e.stopPropagation();
         });
  
@@ -32,6 +32,7 @@ var app = (function ($, L, document) {
 
         $(document).on('articleActivated', function(e, id) { 
             articleMarkers.activateMarker(id);
+            $('#sidebar').toggleClass('active');
         }); 
         
         googleNewsSearch.fetchData().then(processRSSXML).then(function() {
@@ -152,10 +153,8 @@ var app = (function ($, L, document) {
 
     var articleList = (function () {
         var _list = $('<ul/>', {'id': 'articlelist'});
-        var _articlesdiv;
         function init() {
             $('#articles').append(_list);
-            _articlesdiv = $('#articles');
         }
 
         function addListItem(index, xmlitem) {
@@ -222,7 +221,6 @@ var app = (function ($, L, document) {
             var activeLi = $(this);
             activeLi.addClass('active');
             $(document).trigger('articleActivated', [activeLi.attr('id')]);
-            _articlesdiv.toggleClass('active');
         }
 
         return {

@@ -18,10 +18,23 @@
 </head>
 <body>
     <div id='map'>
-    <i id='articlesShow' class='icon-menu'></i>
+        <i id='showSidebar' class='icon-menu'></i>
     </div>
-    <div id='articles'>
-        <img id='ajaxloader' alt='Loading' src='images/ajaxloader.gif'>
+    <div id='sidebar'>
+        <div class='tabs'>
+            <div class='tab'>
+                <input type='radio' id='tab-articles' name='tab-group-1' checked>
+                <label for='tab-articles'>Tab One</label> 
+                <div id='articles' class='content'>
+                    <img id='ajaxloader' alt='Loading' src='images/ajaxloader.gif'>
+                </div>
+            </div>
+            <div class='tab'>
+                <input type='radio' id='tab-2' name='tab-group-1'>
+                <label for='tab-2'>Tab Two</label>    
+                <div class='content'>stuff</div> 
+            </div>  
+        </div>
     </div>
     <div id='footer'></div>
 </body>
