@@ -151,18 +151,16 @@ li a:hover {
 .tabs {
     position: relative;   
     min-height: 100%; /* This part sucks */
-    clear: both;
-    margin: 0.5em 0;
 }
 .tab {
     float: left;
 }
 .tab label {
-    padding: 0.3em; 
-    border: 0.05em solid #B9C0C5; 
-    margin-left: -0.05em; 
+    padding: 12px; 
+    border: 1px solid #B9C0C5; 
+    margin-left: -1px; 
     position: relative;
-    left: 0.05em; 
+    left: 1px;
     font-size: 2em;
 }
 .tab [type=radio] {
@@ -176,11 +174,11 @@ li a:hover {
     bottom: 0;
     background: #f4f4f4;
     overflow: auto;
-    border: 0.05em solid #B9C0C5;; 
+    border: 1px solid #B9C0C5; 
 }
 [type=radio]:checked ~ label {
     background: #f4f4f4;
-    border-bottom: 0.05em solid #f4f4f4;
+    border-bottom: 1px solid #f4f4f4;
     z-index: 2;
 }
 [type=radio]:checked ~ label ~ .content {
