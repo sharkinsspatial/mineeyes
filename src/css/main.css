@@ -151,14 +151,16 @@ li a:hover {
 .tabs {
     position: relative;   
     min-height: 100%; /* This part sucks */
+    margin-top: 5px;
 }
 .tab {
     float: left;
 }
 .tab label {
-    padding: 12px; 
+    padding: 10px; 
     border: 1px solid #B9C0C5; 
     margin-left: -1px; 
+    margin-top: 5px;
     position: relative;
     left: 1px;
     font-size: 2em;
@@ -178,7 +180,7 @@ li a:hover {
 }
 [type=radio]:checked ~ label {
     background: #f4f4f4;
-    border-bottom: 1px solid #f4f4f4;
+    border-bottom: 0.05em solid #f4f4f4;
     z-index: 2;
 }
 [type=radio]:checked ~ label ~ .content {
