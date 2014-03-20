@@ -209,7 +209,7 @@ var app = (function ($, L, document) {
             var articles = $('#articles');
             var activeLi = $('#articlelist' + ' #' + id);
             activeLi.addClass('active');
-            articles.scrollTop(0);
+            articles.scrollTop(8);
             articles.animate({
                 duration: 'slow',
                 scrollTop: activeLi.position().top
