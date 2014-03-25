@@ -1,8 +1,7 @@
 var app = (function ($, L, document) {
     function init() {
-        articleList.init();
+        sideBarLists.init();
         articleMarkers = new ArticleMarkers();
-        projectList.init();
         projectMarkers = new ProjectMarkers();
         var map = L.mapbox.map('map', 'sharkins.map-uwias8cf', {maxZoom:12});
         map.on('ready', function() {
@@ -26,24 +25,33 @@ var app = (function ($, L, document) {
         });
  
         $(document).on('articleMarkerClick', function(e, id) {
-            articleList.scrollToArticle(id);
-        });
-        
-        $(document).on('projectMarkerClick', function(e, id) {
+            sideBarLists.scrollTo(id, 'articles');
         });
 
-        $(document).on('articleDeactivated', function(e, id) {
+        $(document).on('projectMarkerClick', function(e, id) {
+            sideBarLists.scrollTo(id, 'projects');
+        });
+        
+        $(document).on('articlesDeactivated', function(e, id) {
             articleMarkers.deactivateMarker(id);
         });
-        
 
-        $(document).on('articleActivated', function(e, id) { 
+        $(document).on('projectsDeactivated', function(e, id) {
+            projectMarkers.deactivateMarker(id);
+        });
+        
+        $(document).on('articlesActivated', function(e, id) { 
             articleMarkers.activateMarker(id);
             $('#sidebar').toggleClass('active');
         }); 
+
+        $(document).on('projectsActivated', function(e, id) {
+            projectMarkers.activateMarker(id);
+            $('#sidebar').toggleClass('active');
+        });
         
         googleNewsSearch.fetchData().then(processRSSXML).then(function() {
-            articleList.sortByDate();
+            sideBarLists.sortByDate();
             map.addLayer(articleMarkers.getMarkerLayer());
         });
         
@@ -75,7 +83,7 @@ var app = (function ($, L, document) {
                                                  .children('geo\\:long').text());
 
                             articleMarkers.addMarker(index, lat, lon);
-                            articleList.addListItem(index, xmlitem);
+                            sideBarLists.addArticleListItem(index, xmlitem);
                         }
                      });
     }
@@ -162,20 +170,13 @@ var app = (function ($, L, document) {
     
     function ProjectMarkers() {
         Markers.call(this);
-        //this._list = $('<ul/>', {'id': 'projects'});
-        //$('#projects').append(this._list);
         var projectURL = "http://geocatmin.ingemmet.gob.pe/arcgis/rest/services/SERV_CARTERA_PROYECTOS_MINEROS/MapServer/0";
         var that = this;
         this._clusteredFeatureLayer = new L.esri.clusteredFeatureLayer(
             projectURL, {
                 cluster: that._markers,
                 onEachMarker: function (geojson, marker) {
-                    //var listItem = $('<li/>', {
-                        //html: geojson.properties.EMPRESA,
-                        //'id': geojson.properties.OBJECTID
-                    //});
-                    //that._list.append(listItem);
-                    projectList.addListItem(geojson);
+                    sideBarLists.addProjectListItem(geojson);
                     var activeIcon = that._activeIcon;
                     marker.on('click', function() {
                         this.setIcon(activeIcon);
@@ -208,61 +209,24 @@ var app = (function ($, L, document) {
         this._markerMap[index] = marker;
     };
 
-    var projectList = (function () {   
-        var _list = $('<ul/>', {'id': 'projectlist'});
+    var sideBarLists = (function () {
+        var _projectsList = $('<ul/>', {'id': 'projectslist'});
+        var _articlesList = $('<ul/>', {'id': 'articleslist'});
         function init() {
-            $('#projects').append(_list);
+            $('#projects').append(_projectsList);
+            $('#articles').append(_articlesList);
         }
 
-        function addListItem(geojson) {
+        function addProjectListItem(geojson) {
             var listItem = $('<li/>', {
                 html: geojson.properties.EMPRESA,
                 'id': geojson.properties.OBJECTID
             });
             listItem.on('click', click);
-            _list.append(listItem);
+            _projectsList.append(listItem);
         }
         
-        function deactivatePrevious() {
-            var previousActiveLi = $('#projectlist li.active');
-            $(document).trigger('projectDeactivated', 
-                                [previousActiveLi.attr('id')]);
-            previousActiveLi.removeClass('active');
-        }
-        
-        function scrollTo(id) {
-            deactivatePrevious();
-            var div = $('#projects');
-            var activeLi = $('#projectlist' + ' #' + id);
-            activeLi.addClass('active');
-            div.scrollTop(8);
-            div.animate({
-                duration: 'slow',
-                scrollTop: activeLi.position().top
-            });
-        }
-
-        function click(e) { 
-            deactivatePrevious();
-            var activeLi = $(this);
-            activeLi.addClass('active');
-            $(document).trigger('projectActivated', [activeLi.attr('id')]);
-        }
-
-        return {
-            init: init,
-            addListItem: addListItem,
-            scrollTo: scrollTo
-        };
-    })();
-
-    var articleList = (function () {
-        var _list = $('<ul/>', {'id': 'articlelist'});
-        function init() {
-            $('#articles').append(_list);
-        }
-
-        function addListItem(index, xmlitem) {
+        function addArticleListItem(index, xmlitem) {
             var titleComponents = xmlitem
                                     .children('title')
                                     .text()
@@ -284,14 +248,46 @@ var app = (function ($, L, document) {
                 'href': articleOriginUrl,
                 'target': '_blank'
             });
-            listItem.on('click', articleClick);
+            listItem.on('click', click);
             listItem.append(itemLink);
-            _list.append(listItem);
+            _articlesList.append(listItem);
         }
 
+        function deactivatePrevious(source) {
+            var selector = '#' + source + ' li.active'; 
+            var event = source + 'Deactivated';
+            var previousActiveLi = $(selector);
+            $(document).trigger(event, 
+                                [previousActiveLi.attr('id')]);
+            previousActiveLi.removeClass('active');
+        }
+
+        function scrollTo(id, source) {
+            deactivatePrevious(source);
+            var divSelector = '#' + source;
+            var activeSelector = '#' + source + 'list' + ' #' + id;
+            var div = $(divSelector);
+            var activeLi = $(activeSelector);
+            activeLi.addClass('active');
+            div.scrollTop(8);
+            div.animate({
+                duration: 'slow',
+                scrollTop: activeLi.position().top
+            });
+        }
+        
+        function click(e) { 
+            var source = $(e.target).parent().closest('div').attr('id');
+            deactivatePrevious(source);
+            var event = source + 'Activated';
+            var activeLi = $(this);
+            activeLi.addClass('active');
+            $(document).trigger(event, [activeLi.attr('id')]);
+        }
+        
         function sortByDate() {
             var listItems = $('#articlelist li');
-            var list = _list;
+            var list = _articlesList;
             if(listItems.length && list.length) {
                 listItems.sort(function(a,b) {
                     return new Date($(a).attr('datetime')) - 
@@ -301,44 +297,18 @@ var app = (function ($, L, document) {
                 }); 
             }
         }
-
-        function deactivatePreviousArticle() {
-            var previousActiveLi = $('li.active');
-            $(document).trigger('articleDeactivated', 
-                                [previousActiveLi.attr('id')]);
-            previousActiveLi.removeClass('active');
-        }
-        
-        function scrollToArticle(id) {
-            deactivatePreviousArticle();
-            var articles = $('#articles');
-            var activeLi = $('#articlelist' + ' #' + id);
-            activeLi.addClass('active');
-            articles.scrollTop(8);
-            articles.animate({
-                duration: 'slow',
-                scrollTop: activeLi.position().top
-            });
-        }
-
-        function articleClick(e) { 
-            deactivatePreviousArticle();
-            var activeLi = $(this);
-            activeLi.addClass('active');
-            $(document).trigger('articleActivated', [activeLi.attr('id')]);
-        }
-
         return {
             init: init,
-            addListItem: addListItem,
+            addArticleListItem: addArticleListItem,
+            addProjectListItem: addProjectListItem,
             sortByDate: sortByDate,
-            scrollToArticle: scrollToArticle
+            scrollTo: scrollTo
         };
     })();
-
+ 
     return {
         init: init,
         processRSSXML: processRSSXML,
-        articleList: articleList
+        sideBarLists: sideBarLists
    };
 })($, L, this.document);
