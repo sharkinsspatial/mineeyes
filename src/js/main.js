@@ -1,7 +1,9 @@
 var app = (function ($, L, document) {
     function init() {
         articleList.init();
-        projectMarkers.init();
+        articleMarkers = new ArticleMarkers();
+        projectList.init();
+        projectMarkers = new ProjectMarkers();
         var map = L.mapbox.map('map', 'sharkins.map-uwias8cf', {maxZoom:12});
         map.on('ready', function() {
             var miniMap = new L.Control.MiniMap(L.mapbox.tileLayer(
@@ -26,10 +28,14 @@ var app = (function ($, L, document) {
         $(document).on('articleMarkerClick', function(e, id) {
             articleList.scrollToArticle(id);
         });
+        
+        $(document).on('projectMarkerClick', function(e, id) {
+        });
 
         $(document).on('articleDeactivated', function(e, id) {
             articleMarkers.deactivateMarker(id);
         });
+        
 
         $(document).on('articleActivated', function(e, id) { 
             articleMarkers.activateMarker(id);
@@ -86,7 +92,7 @@ var app = (function ($, L, document) {
             var googleUrl = 'https://news.google.com/news/feeds';
             var googleParams = {
                 gl: 'ca',
-                q: 'peru+mining+protests',
+                q: 'peru+mining',
                 um: 1,
                 ie: 'UTF-8',
                 output: 'rss',
@@ -113,96 +119,140 @@ var app = (function ($, L, document) {
             fetchData: fetchData
         };
     })();
+     
+    function Markers () {
+        this._markerMap = {};
+        this._markerList = [];
+        this._defaultIcon = new L.Icon.Default();
+        this._activeIcon = new L.Icon.Default({iconUrl: 
+                                             './images/marker-icon-red.png'});
+        this._markers = new L.MarkerClusterGroup(
+                {spiderfyDistanceMultiplier:1, showCoverageOnHover:false}
+        );
+    }
+
+    Markers.prototype = {
+        getMarkerLayer: function () {
+            var layers = this._markers.getLayers();
+            if (layers.length === 0) {
+                this._markers.addLayers(this._markerList);
+            }
+            return this._markers;
+        },
+        
+        getMarkerList: function () {
+            return this._markerList;
+        },
+        
+        activateMarker: function (id) {
+            var activeMarker = this._markerMap[id];
+            var activeIcon = this._activeIcon;
+            this._markers.zoomToShowLayer(activeMarker, function(){
+                activeMarker.setIcon(activeIcon);
+            });
+        },
+
+        deactivateMarker: function (id) {
+            var previousActiveMarker = this._markerMap[id];  
+            if (previousActiveMarker) {
+                previousActiveMarker.setIcon(this._defaultIcon);
+            }
+        }
+    };
     
-    var projectMarkers = (function () { 
-        var _list = $('<ul/>', {'id': 'projects'});
+    function ProjectMarkers() {
+        Markers.call(this);
+        //this._list = $('<ul/>', {'id': 'projects'});
+        //$('#projects').append(this._list);
+        var projectURL = "http://geocatmin.ingemmet.gob.pe/arcgis/rest/services/SERV_CARTERA_PROYECTOS_MINEROS/MapServer/0";
+        var that = this;
+        this._clusteredFeatureLayer = new L.esri.clusteredFeatureLayer(
+            projectURL, {
+                cluster: that._markers,
+                onEachMarker: function (geojson, marker) {
+                    //var listItem = $('<li/>', {
+                        //html: geojson.properties.EMPRESA,
+                        //'id': geojson.properties.OBJECTID
+                    //});
+                    //that._list.append(listItem);
+                    projectList.addListItem(geojson);
+                    var activeIcon = that._activeIcon;
+                    marker.on('click', function() {
+                        this.setIcon(activeIcon);
+                        $(document).trigger('projectMarkerClick', 
+                                            [geojson.properties.OBJECTID]);
+                    }); 
+                    that._markerList.push(marker);
+                    that._markerMap[geojson.properties.OBJECTID] = marker;
+                }
+            });
+    } 
+    ProjectMarkers.prototype = Object.create(Markers.prototype);    
+    ProjectMarkers.prototype.getMarkerLayer = function () {
+        return this._clusteredFeatureLayer;
+    };
+       
+    function ArticleMarkers() {
+        Markers.call(this);
+    } 
+    ArticleMarkers.prototype = Object.create(Markers.prototype);
+    ArticleMarkers.prototype.addMarker = function (index, lat, lon) {
+        var latlng = new L.LatLng(lat, lon);
+        var marker = L.marker(latlng, {id: index});
+        var activeIcon = this._activeIcon;
+        marker.on('click', function() {
+            this.setIcon(activeIcon);
+            $(document).trigger('articleMarkerClick', [this.options.id]);
+        }); 
+        this._markerList.push(marker);
+        this._markerMap[index] = marker;
+    };
+
+    var projectList = (function () {   
+        var _list = $('<ul/>', {'id': 'projectlist'});
         function init() {
             $('#projects').append(_list);
         }
 
-        var projectURL = "http://geocatmin.ingemmet.gob.pe/arcgis/rest/services/SERV_CARTERA_PROYECTOS_MINEROS/MapServer/0";
-        var _markers = new L.MarkerClusterGroup(
-                {spiderfyDistanceMultiplier:1, showCoverageOnHover:false}
-        );
-        
         function addListItem(geojson) {
             var listItem = $('<li/>', {
                 html: geojson.properties.EMPRESA,
                 'id': geojson.properties.OBJECTID
             });
+            listItem.on('click', click);
             _list.append(listItem);
         }
+        
+        function deactivatePrevious() {
+            var previousActiveLi = $('#projectlist li.active');
+            $(document).trigger('projectDeactivated', 
+                                [previousActiveLi.attr('id')]);
+            previousActiveLi.removeClass('active');
+        }
+        
+        function scrollTo(id) {
+            deactivatePrevious();
+            var div = $('#projects');
+            var activeLi = $('#projectlist' + ' #' + id);
+            activeLi.addClass('active');
+            div.scrollTop(8);
+            div.animate({
+                duration: 'slow',
+                scrollTop: activeLi.position().top
+            });
+        }
 
-        var clusteredFeatureLayer = new L.esri.clusteredFeatureLayer(
-            projectURL, {
-                cluster: _markers,
-                onEachMarker: addListItem  
-        });
-
-        function getMarkerLayer() {
-            return clusteredFeatureLayer;
+        function click(e) { 
+            deactivatePrevious();
+            var activeLi = $(this);
+            activeLi.addClass('active');
+            $(document).trigger('projectActivated', [activeLi.attr('id')]);
         }
 
         return {
             init: init,
-            getMarkerLayer: getMarkerLayer
-        };
-    })();
-
-
-    var articleMarkers = (function () {
-        var _markerMap = {};
-        var _markerList = [];
-        var _defaultIcon = new L.Icon.Default();
-        var _activeIcon = new L.Icon.Default({iconUrl: 
-                                             './images/marker-icon-red.png'});
-        var _markers = new L.MarkerClusterGroup(
-                {spiderfyDistanceMultiplier:1, showCoverageOnHover:false}
-        );
-        
-        function addMarker(index, lat, lon) {
-            var latlng = new L.LatLng(lat, lon);
-            var marker = L.marker(latlng, {id: index});
-            marker.on('click', function() {
-                this.setIcon(_activeIcon);
-                $(document).trigger('articleMarkerClick', [this.options.id]);
-            }); 
-            _markerList.push(marker);
-            _markerMap[index] = marker;
-        }
-        
-        function getMarkerLayer() {
-            var layers = _markers.getLayers();
-            if (layers.length === 0) {
-                _markers.addLayers(_markerList);
-            }
-            return _markers;
-        }
-        
-        function getMarkerList() {
-            return _markerList;
-        }
-        
-        function activateMarker(id) {
-            var activeMarker = _markerMap[id];
-            _markers.zoomToShowLayer(activeMarker, function(){
-                activeMarker.setIcon(_activeIcon);
-            });
-        }
-
-        function deactivateMarker(id) {
-            var previousActiveMarker = _markerMap[id];  
-            if (previousActiveMarker) {
-                previousActiveMarker.setIcon(_defaultIcon);
-            }
-        }
-        
-        return {
-            addMarker: addMarker,
-            getMarkerLayer: getMarkerLayer,
-            getMarkerList: getMarkerList,
-            activateMarker: activateMarker,
-            deactivateMarker: deactivateMarker
+            addListItem: addListItem,
+            scrollTo: scrollTo
         };
     })();
 
@@ -289,7 +339,6 @@ var app = (function ($, L, document) {
     return {
         init: init,
         processRSSXML: processRSSXML,
-        articleList: articleList,
-        articleMarkers: articleMarkers
-    };
+        articleList: articleList
+   };
 })($, L, this.document);
