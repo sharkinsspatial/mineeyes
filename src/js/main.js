@@ -50,7 +50,9 @@ var app = (function ($, L, document) {
             $('#sidebar').toggleClass('active');
         });
         
-        googleNewsSearch.fetchData().then(processRSSXML).then(function() {
+        googleNewsSearch.fetchData().then(function(data) {
+            processRSSXML(data, articleMarkers, sideBarLists);
+        }).then(function() {
             sideBarLists.sortByDate();
             map.addLayer(articleMarkers.getMarkerLayer());
         });
@@ -71,7 +73,7 @@ var app = (function ($, L, document) {
         });
     }
     
-    function processRSSXML(xml) {
+    function processRSSXML(xml, articleMarkers, sideBarLists) {
             $(xml)
                 .find('item')
                     .each(function(index) {
@@ -286,7 +288,7 @@ var app = (function ($, L, document) {
         }
         
         function sortByDate() {
-            var listItems = $('#articlelist li');
+            var listItems = _articlesList.children('li');
             var list = _articlesList;
             if(listItems.length && list.length) {
                 listItems.sort(function(a,b) {
@@ -309,6 +311,7 @@ var app = (function ($, L, document) {
     return {
         init: init,
         processRSSXML: processRSSXML,
-        sideBarLists: sideBarLists
+        sideBarLists: sideBarLists,
+        ArticleMarkers: ArticleMarkers
    };
 })($, L, this.document);
