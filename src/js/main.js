@@ -1,4 +1,4 @@
-var app = (function ($, L, document) {
+var app = (function($, L, document) {
     function init() {
         sideBarLists.init();
         articleMarkers = new ArticleMarkers();
@@ -50,7 +50,7 @@ var app = (function ($, L, document) {
             $('#sidebar').toggleClass('active');
         });
                  
-        $("input[name='radio']").on("change", function () {
+        $("input[name='radio']").on("change", function() {
             if (this.id == 'tab-articles') {
                 map.addLayer(articleMarkers.getMarkerLayer());
                 map.removeLayer(projectMarkers.getMarkerLayer());
@@ -71,7 +71,7 @@ var app = (function ($, L, document) {
                 features: []
             };
             var inc = 0;
-            $.each(data.features, function (index, esriFeature) {
+            $.each(data.features, function(index, esriFeature) {
                 if(!isNaN(esriFeature.geometry.x) || !isNaN(
                     esriFeature.geometry.y)) {
                         var feature = Terraformer.ArcGIS.parse(esriFeature);
@@ -108,7 +108,7 @@ var app = (function ($, L, document) {
                      });
     }
 
-    var projectsSearch = (function () {
+    var projectsSearch = (function() {
         function fetchData() {
             var projectsUrl = 'http://geocatmin.ingemmet.gob.pe/' +
             'arcgis/rest/services/SERV_CARTERA_PROYECTOS_MINEROS/MapServer/0/' +
@@ -121,7 +121,7 @@ var app = (function ($, L, document) {
         };
     })();
 
-    var googleNewsSearch = (function () {
+    var googleNewsSearch = (function() {
         function buildRSSUrl() {
             function buildQueryString(data) {
                 var params = [];
@@ -161,7 +161,7 @@ var app = (function ($, L, document) {
         };
     })();
      
-    function Markers () {
+    function Markers() {
         this._markerMap = {};
         this._markerList = [];
         this._defaultIcon = new L.Icon.Default();
@@ -173,7 +173,7 @@ var app = (function ($, L, document) {
     }
 
     Markers.prototype = {
-        getMarkerLayer: function () {
+        getMarkerLayer: function() {
             var layers = this._markers.getLayers();
             if (layers.length === 0) {
                 this._markers.addLayers(this._markerList);
@@ -181,11 +181,11 @@ var app = (function ($, L, document) {
             return this._markers;
         },
         
-        getMarkerList: function () {
+        getMarkerList: function(){
             return this._markerList;
         },
         
-        activateMarker: function (id) {
+        activateMarker: function(id) {
             var activeMarker = this._markerMap[id];
             var activeIcon = this._activeIcon;
             this._markers.zoomToShowLayer(activeMarker, function(){
@@ -193,7 +193,7 @@ var app = (function ($, L, document) {
             });
         },
 
-        deactivateMarker: function (id) {
+        deactivateMarker: function(id) {
             var previousActiveMarker = this._markerMap[id];  
             if (previousActiveMarker) {
                 previousActiveMarker.setIcon(this._defaultIcon);
@@ -205,16 +205,16 @@ var app = (function ($, L, document) {
         Markers.call(this); 
     } 
     ProjectMarkers.prototype = Object.create(Markers.prototype);    
-    ProjectMarkers.prototype.getMarkerLayer = function () {
+    ProjectMarkers.prototype.getMarkerLayer = function() {
         return this._markers;
     };
-    ProjectMarkers.prototype.addMarkers = function (geojson) {
+    ProjectMarkers.prototype.addMarkers = function(geojson) {
         var that = this;
         var geoJsonLayer = L.geoJson(geojson, { 
-            pointToLayer: function (feature, latlng) {
+            pointToLayer: function(feature, latlng) {
                 var marker = L.marker(latlng, {id: feature.id});
                 var activeIcon = that._activeIcon;
-                marker.on('click', function () {
+                marker.on('click', function() {
                     this.setIcon(activeIcon);
                     $(document).trigger('projectMarkerClick', [this.options.id]);
                 });
@@ -230,11 +230,11 @@ var app = (function ($, L, document) {
         Markers.call(this);
     } 
     ArticleMarkers.prototype = Object.create(Markers.prototype);
-    ArticleMarkers.prototype.addMarker = function (index, lat, lon) {
+    ArticleMarkers.prototype.addMarker = function(index, lat, lon) {
         var latlng = new L.LatLng(lat, lon);
         var marker = L.marker(latlng, {id: index});
         var activeIcon = this._activeIcon;
-        marker.on('click', function () {
+        marker.on('click', function() {
             this.setIcon(activeIcon);
             $(document).trigger('articleMarkerClick', [this.options.id]);
         }); 
@@ -242,7 +242,7 @@ var app = (function ($, L, document) {
         this._markerMap[index] = marker;
     };
 
-    var sideBarLists = (function () {
+    var sideBarLists = (function() {
         var _projectsList = $('<ul/>', {'id': 'projectslist'});
         var _articlesList = $('<ul/>', {'id': 'articleslist'});
         function init() {
