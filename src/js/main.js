@@ -49,14 +49,7 @@ var app = (function ($, L, document) {
             projectMarkers.activateMarker(id);
             $('#sidebar').toggleClass('active');
         });
-        
-        googleNewsSearch.fetchData().then(function(data) {
-            processRSSXML(data, articleMarkers, sideBarLists);
-        }).then(function() {
-            sideBarLists.sortByDate();
-            map.addLayer(articleMarkers.getMarkerLayer());
-        });
-        
+                 
         $("input[name='radio']").on("change", function () {
             if (this.id == 'tab-articles') {
                 map.addLayer(articleMarkers.getMarkerLayer());
@@ -71,6 +64,31 @@ var app = (function ($, L, document) {
                 map.removeLayer(projectMarkers.getMarkerLayer());
             }
         });
+
+        projectsSearch.fetchData().done(function(data) {
+            var geojson = {
+                type: 'FeatureCollection',
+                features: []
+            };
+            var inc = 0;
+            $.each(data.features, function (index, esriFeature) {
+                if(!isNaN(esriFeature.geometry.x) || !isNaN(
+                    esriFeature.geometry.y)) {
+                        var feature = Terraformer.ArcGIS.parse(esriFeature);
+                        geojson.features.push(feature);
+                        sideBarLists.addProjectListItem(feature);
+                }
+            });
+            projectMarkers.addMarkers(geojson);
+        });
+        
+        googleNewsSearch.fetchData().then(function(data) {
+            processRSSXML(data, articleMarkers, sideBarLists);
+        }).then(function() {
+            sideBarLists.sortByDate();
+            map.addLayer(articleMarkers.getMarkerLayer());
+        });
+
     }
     
     function processRSSXML(xml, articleMarkers, sideBarLists) {
@@ -89,6 +107,19 @@ var app = (function ($, L, document) {
                         }
                      });
     }
+
+    var projectsSearch = (function () {
+        function fetchData() {
+            var projectsUrl = 'http://geocatmin.ingemmet.gob.pe/' +
+            'arcgis/rest/services/SERV_CARTERA_PROYECTOS_MINEROS/MapServer/0/' +
+                'query?where=OBJECTID+%3E+0&outFields=' +
+                    'OBJECTID%2CEMPRESA%2C+ESTADO&OutSR=4326&f=json';
+            return $.getJSON(projectsUrl);
+        }
+        return {
+            fetchData: fetchData
+        };
+    })();
 
     var googleNewsSearch = (function () {
         function buildRSSUrl() {
@@ -171,28 +202,28 @@ var app = (function ($, L, document) {
     };
     
     function ProjectMarkers() {
-        Markers.call(this);
-        var projectURL = "http://geocatmin.ingemmet.gob.pe/arcgis/rest/services/SERV_CARTERA_PROYECTOS_MINEROS/MapServer/0";
-        var that = this;
-        this._clusteredFeatureLayer = new L.esri.clusteredFeatureLayer(
-            projectURL, {
-                cluster: that._markers,
-                onEachMarker: function (geojson, marker) {
-                    sideBarLists.addProjectListItem(geojson);
-                    var activeIcon = that._activeIcon;
-                    marker.on('click', function() {
-                        this.setIcon(activeIcon);
-                        $(document).trigger('projectMarkerClick', 
-                                            [geojson.properties.OBJECTID]);
-                    }); 
-                    that._markerList.push(marker);
-                    that._markerMap[geojson.properties.OBJECTID] = marker;
-                }
-            });
+        Markers.call(this); 
     } 
     ProjectMarkers.prototype = Object.create(Markers.prototype);    
     ProjectMarkers.prototype.getMarkerLayer = function () {
-        return this._clusteredFeatureLayer;
+        return this._markers;
+    };
+    ProjectMarkers.prototype.addMarkers = function (geojson) {
+        var that = this;
+        var geoJsonLayer = L.geoJson(geojson, { 
+            pointToLayer: function (feature, latlng) {
+                var marker = L.marker(latlng, {id: feature.id});
+                var activeIcon = that._activeIcon;
+                marker.on('click', function () {
+                    this.setIcon(activeIcon);
+                    $(document).trigger('projectMarkerClick', [this.options.id]);
+                });
+                that._markerList.push(marker);
+                that._markerMap[feature.id] = marker;
+                return marker;
+            }
+        });
+        this._markers.addLayer(geoJsonLayer);
     };
        
     function ArticleMarkers() {
@@ -203,7 +234,7 @@ var app = (function ($, L, document) {
         var latlng = new L.LatLng(lat, lon);
         var marker = L.marker(latlng, {id: index});
         var activeIcon = this._activeIcon;
-        marker.on('click', function() {
+        marker.on('click', function () {
             this.setIcon(activeIcon);
             $(document).trigger('articleMarkerClick', [this.options.id]);
         }); 
