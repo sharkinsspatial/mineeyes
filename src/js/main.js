@@ -65,7 +65,7 @@ var app = (function($, L, document) {
             }
         });
 
-        projectsSearch.fetchData().done(function(data) {
+        services.fetchProjectsData().done(function(data) {
             var geojson = {
                 type: 'FeatureCollection',
                 features: []
@@ -82,7 +82,7 @@ var app = (function($, L, document) {
             projectMarkers.addMarkers(geojson);
         });
         
-        googleNewsSearch.fetchData().then(function(data) {
+        services.fetchNewsData().then(function(data) {
             processRSSXML(data, articleMarkers, sideBarLists);
         }).then(function() {
             sideBarLists.sortByDate();
@@ -108,28 +108,30 @@ var app = (function($, L, document) {
                      });
     }
 
-    var projectsSearch = (function() {
-        function fetchData() {
-            var projectsUrl = 'http://geocatmin.ingemmet.gob.pe/' +
-            'arcgis/rest/services/SERV_CARTERA_PROYECTOS_MINEROS/MapServer/0/' +
-                'query?where=OBJECTID+%3E+0&outFields=' +
-                    'OBJECTID%2CEMPRESA%2C+ESTADO&OutSR=4326&f=json';
-            return $.getJSON(projectsUrl);
+    var services = (function() {
+        function buildQueryString(data) {
+            var params = [];
+            for (var d in data) {
+                params.push(d + '=' + data[d]);
+            }
+            return params.join('&');
         }
-        return {
-            fetchData: fetchData
-        };
-    })();
+        
+        function buildProjectsUrl() {
+            var baseUrl = 'http://geocatmin.ingemmet.gob.pe/' +
+            'arcgis/rest/services/SERV_CARTERA_PROYECTOS_MINEROS/MapServer/0/query';
+            
+            var params = {
+               where: 'OBJECTID > 0',
+               outFields: 'OBJECTID, EMPRESA, ESTADO',
+               OutSR: 4326,
+               f: 'json'
+            };
+            var projectsUrl = baseUrl + '?' + buildQueryString(params);
+            return projectsUrl;
+        }
 
-    var googleNewsSearch = (function() {
-        function buildRSSUrl() {
-            function buildQueryString(data) {
-                var params = [];
-                for (var d in data) {
-                    params.push(d + '=' + data[d]);
-                }
-                return params.join('&');
-            } 
+        function buildNewsUrl() {
             var googleUrl = 'https://news.google.com/news/feeds';
             var googleParams = {
                 gl: 'ca',
@@ -152,12 +154,17 @@ var app = (function($, L, document) {
             return geonamesUrl;
         }
 
-        function fetchData() {
-            return $.ajax(buildRSSUrl());
+        function fetchNewsData() {
+            return $.ajax(buildNewsUrl());
+        }
+
+        function fetchProjectsData() {
+            return $.getJSON(buildProjectsUrl());
         }
 
         return {
-            fetchData: fetchData
+            fetchNewsData: fetchNewsData,
+            fetchProjectsData: fetchProjectsData
         };
     })();
      
