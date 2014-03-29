@@ -86,7 +86,9 @@ var app = (function($, L, document) {
             processRSSXML(data, articleMarkers, sideBarLists);
         }).then(function() {
             sideBarLists.sortByDate();
-            map.addLayer(articleMarkers.getMarkerLayer());
+            if  ($('#tab-articles').is(':checked')) {
+                map.addLayer(articleMarkers.getMarkerLayer());
+            }
         });
 
     }
