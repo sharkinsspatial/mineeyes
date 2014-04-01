@@ -58,18 +58,18 @@ li.active {
     background-color: #cb2944;
 }
 li span {
-   font-size: 1em;
+    font-size: 1em;
     color: #000000;
     float: left;
     padding-top: 0.2em;
 }
-li:hover a {
+li:hover a, li:hover .sub {
     color: #756C6C;
 }
-li.active a {
+li.active a, li.active .sub {
     color: #000000;
 }
-li a {
+li a, li .sub{
     font-size: 80%;
     color: #999;
     text-decoration: none;

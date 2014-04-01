@@ -273,12 +273,25 @@ var app = (function($, L, document) {
                 var normalizedAscii = normalizedAbbr.replace('?', 'ñ');
                 return normalizedAscii;
             }
+            
+            function capitalizeFirstLetter(string) {
+                var lower = string.toLowerCase();
+                return lower.charAt(0).toUpperCase() + lower.slice(1); 
+            }
 
             var company = normalizeText(geojson.properties.EMPRESA);
+            var projectState = capitalizeFirstLetter(geojson.properties.ESTADO);
+            var projectSpan = $('<span/>', {
+                html: company
+            });
+            var stateSpan = $('<span/>', {
+                html: projectState
+            }).addClass('sub');
             var listItem = $('<li/>', {
-                html: company,
+                html: projectSpan,
                 'id': geojson.properties.OBJECTID
             });
+            listItem.append(stateSpan);
             listItem.on('click', click);
             _projectsList.append(listItem);
         }
