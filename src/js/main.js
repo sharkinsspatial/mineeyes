@@ -80,6 +80,7 @@ var app = (function($, L, document) {
                 }
             });
             projectMarkers.addMarkers(geojson);
+            sideBarLists.sortByAlpha();
         });
         
         services.fetchNewsData().then(function(data) {
@@ -260,8 +261,22 @@ var app = (function($, L, document) {
         }
 
         function addProjectListItem(geojson) {
+            function normalizeText(str) {
+                var sentenceCase = str.replace(/\w\S*/g, 
+                    function(results){return results.charAt(0).toUpperCase() + 
+                        results.substr(1).toLowerCase();
+                    });
+                var normalizedAbbr = sentenceCase.replace(/[a-z]\./g, 
+                    function(results) {
+                        return results.toUpperCase();
+                });
+                var normalizedAscii = normalizedAbbr.replace('?', 'ñ');
+                return normalizedAscii;
+            }
+
+            var company = normalizeText(geojson.properties.EMPRESA);
             var listItem = $('<li/>', {
-                html: geojson.properties.EMPRESA,
+                html: company,
                 'id': geojson.properties.OBJECTID
             });
             listItem.on('click', click);
@@ -327,6 +342,30 @@ var app = (function($, L, document) {
             $(document).trigger(event, [activeLi.attr('id')]);
         }
         
+        function sortByAlpha() {
+            var listItems = _projectsList.children('li');
+            var list = _projectsList;
+            if (listItems.length && list.length) {
+                listItems.sort(function(a,b) {
+                    var textA = $(a).text();
+                    var textB = $(b).text();
+                    var compare;
+                    if (textA < textB) {
+                        compare = -1;
+                    } 
+                    else if (textA > textB) {
+                        compare = 1;
+                    }
+                    else {
+                        compare = 0;
+                    }
+                    return compare;
+                }).each(function() {
+                    list.append(this);
+                });
+            }
+        }
+
         function sortByDate() {
             var listItems = _articlesList.children('li');
             var list = _articlesList;
@@ -343,6 +382,7 @@ var app = (function($, L, document) {
             init: init,
             addArticleListItem: addArticleListItem,
             addProjectListItem: addProjectListItem,
+            sortByAlpha: sortByAlpha,
             sortByDate: sortByDate,
             scrollTo: scrollTo
         };
