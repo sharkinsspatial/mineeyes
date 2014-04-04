@@ -137,12 +137,30 @@ var sideBarLists = (function() {
             }); 
         }
     }
+
+    function displayProjectsError() {
+        var errorSpan = $('<span/>', {
+            id: 'projectsError',
+            html: 'There was a problem retrieving projects from the server' 
+        });
+        $('#projects').prepend(errorSpan);
+    }
+
+    function displayArticlesError() {
+        var errorSpan = $('<span/>', {
+            id: 'articlesError',
+            html: 'There was a problem retrieving articles from the server' 
+        });
+        $('#articles').prepend(errorSpan);
+    }
     return {
         init: init,
         addArticleListItem: addArticleListItem,
         addProjectListItem: addProjectListItem,
         sortByAlpha: sortByAlpha,
         sortByDate: sortByDate,
-        scrollTo: scrollTo
+        scrollTo: scrollTo,
+        displayProjectsError: displayProjectsError,
+        displayArticlesError: displayArticlesError
     };
 })();

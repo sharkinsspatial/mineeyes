@@ -65,35 +65,46 @@ var app = (function($, L, document) {
             }
         });
 
-        services.fetchProjectsData().done(function(data) {
-            var geojson = {
-                type: 'FeatureCollection',
-                features: []
-            };
-            var inc = 0;
-            $.each(data.features, function(index, esriFeature) {
-                if(!isNaN(esriFeature.geometry.x) || !isNaN(
-                    esriFeature.geometry.y)) {
-                        var feature = Terraformer.ArcGIS.parse(esriFeature);
-                        geojson.features.push(feature);
-                        sideBarLists.addProjectListItem(feature);
-                }
-            });
-            projectMarkers.addMarkers(geojson);
-            sideBarLists.sortByAlpha();
+        services.fetchProjectsData()
+        .done(function(data) {
+            processProjectsData(data, projectMarkers, sideBarLists);
+        })
+        .fail(function() {
+            sideBarLists.displayProjectsError();
         });
         
-        services.fetchNewsData().then(function(data) {
+        services.fetchNewsData()
+        .then(function(data) {
             processRSSXML(data, articleMarkers, sideBarLists);
-        }).then(function() {
+        })
+        .then(function() {
             sideBarLists.sortByDate();
             if  ($('#tab-articles').is(':checked')) {
                 map.addLayer(articleMarkers.getMarkerLayer());
             }
+        })
+        .fail(function() {
+            sideBarLists.displayArticlesError();
         });
-
     }
-    
+
+    function processProjectsData(data, projectMarkers, sideBarLists) {
+        var geojson = {
+                type: 'FeatureCollection',
+                features: []
+            };
+        $.each(data.features, function(index, esriFeature) {
+            if (!isNaN(esriFeature.geometry.x) && !isNaN(
+                esriFeature.geometry.y)) {
+                    var feature = Terraformer.ArcGIS.parse(esriFeature);
+                    geojson.features.push(feature);
+                    sideBarLists.addProjectListItem(feature);
+            }
+        });
+        projectMarkers.addMarkers(geojson);
+        sideBarLists.sortByAlpha();
+    }
+
     function processRSSXML(xml, articleMarkers, sideBarLists) {
         $(xml)
             .find('item')
@@ -113,6 +124,7 @@ var app = (function($, L, document) {
 
     return {
         init: init,
+        processProjectsData: processProjectsData,
         processRSSXML: processRSSXML
    };
 })($, L, this.document);

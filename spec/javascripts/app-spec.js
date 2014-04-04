@@ -42,14 +42,31 @@ describe('app.processRSSXML with invalid data', function() {
     });
 });
 
-function generateXMLData(valid) {
-    var xml;
-    if (valid) {
-        xml = '<item><geo:lat xmlns:geo="test">5.1</geo:lat>' + 
-            '<geo:long xmlns:geo="test">1.4</geo:long></item>';
-    } else {
-        xml = '<item><geo:lat xmlns:geo="test">5.1</geo:lat></item>';
-    }
-    var xmlDocument = $.parseXML(xml);
-    return xmlDocument;
-}
+describe('app.processProjectsData with invalid data', function() {
+    var projectMarkers;
+    beforeEach(function() {
+        sideBarLists.init();
+        projectMarkers = new markers.ProjectMarkers();
+        var esriData = generateESRIData(false);
+        spyOn(sideBarLists, 'addProjectListItem');
+        app.processProjectsData(esriData, projectMarkers, sideBarLists);
+    });
+    it('does not call sideBarLists.addProjectListItem with invalid x coord', function() {
+        expect(sideBarLists.addProjectListItem).not.toHaveBeenCalled();
+    });
+});
+
+describe('app.processProjectsData', function() {
+    var projectMarkers;
+    beforeEach(function() {
+        sideBarLists.init();
+        projectMarkers = new markers.ProjectMarkers();
+        var esriData = generateESRIData(true);
+        spyOn(sideBarLists, 'addProjectListItem');
+        app.processProjectsData(esriData, projectMarkers, sideBarLists);
+    });
+    it('should call sideBarLists.addProjectListItem once for each valid feature', function() {
+        expect(sideBarLists.addProjectListItem.calls.count()).toEqual(1);
+    });
+});
+
