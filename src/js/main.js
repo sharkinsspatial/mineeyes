@@ -50,7 +50,7 @@ var app = (function($, L, document) {
             $('#sidebar').toggleClass('active');
         });
                  
-        $("input[name='radio']").on("change", function() {
+        $("input[name='radio']").on('change', function() {
             if (this.id == 'tab-articles') {
                 map.addLayer(articleMarkers.getMarkerLayer());
                 map.removeLayer(projectMarkers.getMarkerLayer());
