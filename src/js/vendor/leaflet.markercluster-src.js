@@ -329,12 +329,13 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	//Override FeatureGroup.getBounds as it doesn't work
 	getBounds: function () {
 		var bounds = new L.LatLngBounds();
+
 		if (this._topClusterLevel) {
 			bounds.extend(this._topClusterLevel._bounds);
-		} else {
-			for (var i = this._needsClustering.length - 1; i >= 0; i--) {
-				bounds.extend(this._needsClustering[i].getLatLng());
-			}
+		}
+
+		for (var i = this._needsClustering.length - 1; i >= 0; i--) {
+			bounds.extend(this._needsClustering[i].getLatLng());
 		}
 
 		bounds.extend(this._nonPointGroup.getBounds());
@@ -427,16 +428,27 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		};
 
 		if (layer._icon && this._map.getBounds().contains(layer.getLatLng())) {
+			//Layer is visible ond on screen, immediate return
 			callback();
 		} else if (layer.__parent._zoom < this._map.getZoom()) {
-			//Layer should be visible now but isn't on screen, just pan over to it
+			//Layer should be visible at this zoom level. It must not be on screen so just pan over to it
 			this._map.on('moveend', showMarker, this);
 			this._map.panTo(layer.getLatLng());
 		} else {
+			var moveStart = function () {
+				this._map.off('movestart', moveStart, this);
+				moveStart = null;
+			};
+
+			this._map.on('movestart', moveStart, this);
 			this._map.on('moveend', showMarker, this);
 			this.on('animationend', showMarker, this);
-			this._map.setView(layer.getLatLng(), layer.__parent._zoom + 1);
 			layer.__parent.zoomToBounds();
+
+			if (moveStart) {
+				//Never started moving, must already be there, probably need clustering however
+				showMarker.call(this);
+			}
 		}
 	},
 
@@ -727,7 +739,6 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		var maxZoom = this._map.getMaxZoom(),
 			radius = this.options.maxClusterRadius,
 			radiusFn = radius;
-	
 		//If we just set maxClusterRadius to a single number, we need to create
 		//a simple function to return that number. Otherwise, we just have to
 		//use the function we've passed in.
@@ -741,8 +752,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		this._maxZoom = maxZoom;
 		this._gridClusters = {};
 		this._gridUnclustered = {};
-	
-		//Set up DistanceGrids for each zoom
+        //Set up DistanceGrids for each zoom
 		for (var zoom = maxZoom; zoom >= 0; zoom--) {
 			this._gridClusters[zoom] = new L.DistanceGrid(radiusFn(zoom));
 			this._gridUnclustered[zoom] = new L.DistanceGrid(radiusFn(zoom));
@@ -845,7 +855,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		//Incase we are starting to split before the animation finished
 		this._processQueue();
 
-		if (this._zoom < this._map._zoom && this._currentShownBounds.contains(this._getExpandedVisibleBounds())) { //Zoom in, split
+		if (this._zoom < this._map._zoom && this._currentShownBounds.intersects(this._getExpandedVisibleBounds())) { //Zoom in, split
 			this._animationStart();
 			//Remove clusters now off screen
 			this._topClusterLevel._recursivelyRemoveChildrenFromMap(this._currentShownBounds, this._zoom, this._getExpandedVisibleBounds());
@@ -1134,7 +1144,7 @@ L.MarkerCluster = L.Marker.extend({
 			mapZoom = map.getZoom(),
 			i;
 
-		//calculate how fare we need to zoom down to see all of the markers
+		//calculate how far we need to zoom down to see all of the markers
 		while (childClusters.length > 0 && boundsZoom > zoom) {
 			zoom++;
 			var newClusters = [];
@@ -1889,7 +1899,6 @@ L.MarkerCluster.include(!L.DomUtil.TRANSITION ? {
 			if (m.setOpacity) {
 				m.setZIndexOffset(1000000); //Make these appear on top of EVERYTHING
 				m.setOpacity(0);
-			
 				fg.addLayer(m);
 
 				m._setPos(thisLayerPos);
@@ -1913,8 +1922,7 @@ L.MarkerCluster.include(!L.DomUtil.TRANSITION ? {
 			//Move marker to new position
 			m._preSpiderfyLatlng = m._latlng;
 			m.setLatLng(newPos);
-			
-			if (m.setOpacity) {
+            if (m.setOpacity) {
 				m.setOpacity(1);
 			}
 
