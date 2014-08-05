@@ -69,17 +69,20 @@ var sideBarLists = (function() {
         _articlesList.append(listItem);
     }
 
-    function deactivatePrevious(source) {
+    function deactivatePrevious(id, source) {
         var selector = '#' + source + ' li.active'; 
         var event = source + 'Deactivated';
         var previousActiveLi = $(selector);
-        $(document).trigger(event, 
-                            [previousActiveLi.attr('id')]);
-        previousActiveLi.removeClass('active');
+        var previousActiveLiId = previousActiveLi.attr('id');
+        if (id != previousActiveLiId) {
+            $(document).trigger(event,
+                                previousActiveLiId);
+            previousActiveLi.removeClass('active');
+        }
     }
 
     function scrollTo(id, source) {
-        deactivatePrevious(source);
+        deactivatePrevious(id, source);
         var divSelector = '#' + source;
         var activeSelector = '#' + source + 'list' + ' #' + id;
         var div = $(divSelector);
@@ -94,7 +97,8 @@ var sideBarLists = (function() {
     
     function click(e) { 
         var source = $(e.target).parent().closest('div').attr('id');
-        deactivatePrevious(source);
+        var id = $(e.target).attr('id');
+        deactivatePrevious(id, source);
         var event = source + 'Activated';
         var activeLi = $(this);
         activeLi.addClass('active');
