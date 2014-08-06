@@ -9,14 +9,31 @@ var app = (function($, L, document) {
                 'sharkins.hc52c67l'), {position: 'bottomleft'})
                 .addTo(map);
         });
+        var articlesDiv = $('#articles');
+        var projectsDiv = $('#projects');
 
         $(document)
             .hide()
-            .ajaxStart(function() {
-                $('#ajaxloader').show();
+            .ajaxSend(function(event, request, settings) {
+                var parser = document.createElement('a');
+                parser.href = settings.url;
+                if (parser.hostname == 'api.geonames.org') {
+                    articlesDiv.addClass('csspinner traditional');
+                }
+                else if (parser.hostname == 'geocatmin.ingemmet.gob.pe') {
+                    projectsDiv.addClass('csspinner traditional');
+                }
             })
-            .ajaxStop(function() {
-                $('#ajaxloader').hide();
+            .ajaxComplete(function(event, request, settings) {
+                var parser = document.createElement('a');
+                parser.href = settings.url;
+                if (parser.hostname == 'api.geonames.org') {
+                    articlesDiv.removeClass('csspinner traditional');
+                }
+                else if (parser.hostname == 'geocatmin.ingemmet.gob.pe') {
+                    projectsDiv.removeClass('csspinner traditional');
+                }
+
             });
 
         $('#showSidebar').click(function(e) {
@@ -54,10 +71,14 @@ var app = (function($, L, document) {
             if (this.id == 'tab-articles') {
                 map.addLayer(articleMarkers.getMarkerLayer());
                 map.removeLayer(projectMarkers.getMarkerLayer());
+                articlesDiv.show();
+                projectsDiv.hide();
             }
             else if (this.id == 'tab-projects') {
                 map.removeLayer(articleMarkers.getMarkerLayer());
                 map.addLayer(projectMarkers.getMarkerLayer());
+                projectsDiv.show();
+                articlesDiv.hide();
             }
             else if (this.id == 'tab-earthquakes') {
                 map.removeLayer(articleMarkers.getMarkerLayer());

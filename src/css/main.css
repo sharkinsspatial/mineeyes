@@ -31,11 +31,6 @@ html, body {
 #sidebar.active {
     right: 0;
 }
-#ajaxloader {
-    padding: 1%;
-    display: block;
-    margin: 0 auto;
-}
 ul {
     padding: 0;
 }
