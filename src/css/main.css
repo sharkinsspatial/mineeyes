@@ -146,10 +146,10 @@ li a:hover {
 .tabs {
     position: relative;   
     min-height: 100%; /* This part sucks */
-    margin-top: 5px;
 }
 .tab {
     float: left;
+    padding-top: 5px;
 }
 .tab label {
     padding: 10px; 
@@ -173,6 +173,9 @@ li a:hover {
     overflow: auto;
     border: 1px solid #B9C0C5; 
 }
+.toppad {
+    padding-top: 5px;
+}
 [type=radio]:checked ~ label {
     background: #f4f4f4;
     border-bottom: 0.05em solid #f4f4f4;
@@ -181,3 +184,4 @@ li a:hover {
 [type=radio]:checked ~ label ~ .content {
     z-index: 1;
 }
+
