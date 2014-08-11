@@ -175,6 +175,7 @@ li a:hover {
 }
 .toppad {
     padding-top: 5px;
+    border: 0px;
 }
 [type=radio]:checked ~ label {
     background: #f4f4f4;
