@@ -71,7 +71,45 @@ module.exports = function(grunt) {
                   {expand: true, cwd: 'src/css', src: ['fonts/*'], dest: 'dist/css', filter: 'isFile'},
               ]
           }
-        }
+        },
+        aws: grunt.file.readJSON('/Users/Sharkins/Documents/AWS/grunt-aws.json'),
+          s3: {
+            options: {
+              key: '<%= aws.key %>',
+              secret: '<%= aws.secret %>',
+              bucket: '<%= aws.bucket %>',
+              access: 'public-read',
+              headers: {
+                // Two Year cache policy (1000 * 60 * 60 * 24 * 730)
+                "Cache-Control": "max-age=630720000, public",
+                "Expires": new Date(Date.now() + 63072000000).toUTCString()
+              }
+            },
+            dev: {
+                upload: [
+                    {
+                        src: 'dist/index.html',
+                        dest: 'index.html'
+                    },
+                    {
+                        src: 'dist/css/*',
+                        dest: 'css'
+                    },
+                    {
+                        src: 'dist/css/fonts/*',
+                        dest: 'css/fonts'
+                    },
+                    {
+                        src: 'dist/js/*',
+                        dest: 'js'
+                    },
+                    {
+                        src: 'dist/images/*',
+                        dest: 'images'
+                    }
+                ]
+              }
+          }
     });
     grunt.loadNpmTasks('grunt-contrib-jasmine');
     grunt.loadNpmTasks('grunt-contrib-clean');
@@ -79,6 +117,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-cssmin');
     grunt.loadNpmTasks('grunt-contrib-copy');
+    grunt.loadNpmTasks('grunt-s3');
     grunt.registerTask(
         'build',
         ['jasmine', 'clean', 'dom_munger', 'cssmin', 'uglify', 'copy']
