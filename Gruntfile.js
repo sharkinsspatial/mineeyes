@@ -120,7 +120,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-s3');
     grunt.registerTask(
         'build',
-        ['jasmine', 'clean', 'dom_munger', 'cssmin', 'uglify', 'copy']
+        ['jasmine', 'clean', 'dom_munger', 'cssmin', 'uglify', 'copy', 's3']
     );
 };
 
