@@ -52,9 +52,6 @@ li span {
     float: left;
     padding-top: 0.2em;
 }
-li.active a, li.active .sub {
-    color: #000000;
-}
 li a, li .sub{
     font-size: 80%;
     color: #999;
@@ -90,12 +87,15 @@ li a:hover {
     li:hover {
         background-color: #E4DADA; 
     }
-    li.active {
-        background-color: #cb2944;
-    }
     li:hover a, li:hover .sub {
         color: #756C6C;
     }
+}
+li.active {
+    background-color: #cb2944;
+}
+li.active a, li.active .sub {
+    color: #000000;
 }
 #showSidebar {
     position: absolute;
