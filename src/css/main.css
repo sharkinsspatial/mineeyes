@@ -46,9 +46,6 @@ li {
 li:last-child {
     border-bottom-width: 0em;
 }
-li.active {
-    background-color: #cb2944;
-}
 li span {
     font-size: 1em;
     color: #000000;
@@ -92,6 +89,9 @@ li a:hover {
     }
     li:hover {
         background-color: #E4DADA; 
+    }
+    li.active {
+        background-color: #cb2944;
     }
     li:hover a, li:hover .sub {
         color: #756C6C;
