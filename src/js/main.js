@@ -11,6 +11,7 @@ var app = (function($, L, document) {
         });
         var articlesDiv = $('#articles');
         var projectsDiv = $('#projects');
+        var mapDiv = $('#map');
 
         $(document)
             .hide()
@@ -19,9 +20,11 @@ var app = (function($, L, document) {
                 parser.href = settings.url;
                 if (parser.hostname == 'api.geonames.org') {
                     articlesDiv.addClass('csspinner traditional');
+                    mapDiv.addClass('csspinner traditional');
                 }
                 else if (parser.hostname == 'geocatmin.ingemmet.gob.pe') {
                     projectsDiv.addClass('csspinner traditional');
+                    mapDiv.addClass('csspinner traditional');
                 }
             })
             .ajaxComplete(function(event, request, settings) {
@@ -34,6 +37,9 @@ var app = (function($, L, document) {
                     projectsDiv.removeClass('csspinner traditional');
                 }
 
+            })
+            .ajaxStop(function() {
+                mapDiv.removeClass('csspinner traditional');
             });
 
         $('#showSidebar').click(function(e) {
