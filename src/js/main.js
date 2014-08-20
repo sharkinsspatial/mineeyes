@@ -46,6 +46,11 @@ var app = (function($, L, document) {
             $('#sidebar').toggleClass('active');
             e.stopPropagation();
         });
+
+        $('#hideSidebar').click(function(e) {
+            $('#sidebar').toggleClass('active');
+            //e.stopPropagation();
+        });
  
         $(document).on('articleMarkerClick', function(e, id) {
             sideBarLists.scrollTo(id, 'articles');

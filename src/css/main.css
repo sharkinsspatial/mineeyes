@@ -90,6 +90,9 @@ li a:hover {
     li:hover a, li:hover .sub {
         color: #756C6C;
     }
+    #showMap {
+        display: none;
+    }
 }
 li.active {
     background-color: #cb2944;
@@ -126,11 +129,11 @@ li.active a, li.active .sub {
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 }
-.icon-hammer:before {
-	content: "\e601";
-}
 .icon-eye:before {
 	content: "\e600";
+}
+.icon-hammer:before {
+	content: "\e601";
 }
 .icon-warning:before {
 	content: "\e602";
@@ -141,6 +144,13 @@ li.active a, li.active .sub {
 .icon-menu:before {
 	content: "\e604";
     font-size: 3em;
+}
+.icon-earth:before {
+    content: "\e605";
+    font-size: 2em;
+    float: right;
+    padding-top: 5px;
+    padding-right: 10px;
 }
 
 .tabs {
