@@ -90,7 +90,7 @@ li a:hover {
     li:hover a, li:hover .sub {
         color: #756C6C;
     }
-    #showMap {
+    #hideSidebar {
         display: none;
     }
 }
