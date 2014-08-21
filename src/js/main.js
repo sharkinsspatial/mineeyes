@@ -3,6 +3,7 @@ var app = (function($, L, document) {
         sideBarLists.init();
         articleMarkers = new markers.ArticleMarkers();
         projectMarkers = new markers.ProjectMarkers();
+        earthquakeMarkers = new markers.EarthquakeMarkers();
         var map = L.mapbox.map('map', 'sharkins.map-uwias8cf', {maxZoom:12});
         map.on('ready', function() {
             var miniMap = new L.Control.MiniMap(L.mapbox.tileLayer(
@@ -49,7 +50,6 @@ var app = (function($, L, document) {
 
         $('#hideSidebar').click(function(e) {
             $('#sidebar').toggleClass('active');
-            //e.stopPropagation();
         });
  
         $(document).on('articleMarkerClick', function(e, id) {
@@ -80,20 +80,22 @@ var app = (function($, L, document) {
                  
         $("input[name='radio']").on('change', function() {
             if (this.id == 'tab-articles') {
-                map.addLayer(articleMarkers.getMarkerLayer());
-                map.removeLayer(projectMarkers.getMarkerLayer());
+                map.addLayer(articleMarkers);
+                map.removeLayer(earthquakeMarkers);
+                map.removeLayer(projectMarkers);
                 articlesDiv.show();
                 projectsDiv.hide();
             }
             else if (this.id == 'tab-projects') {
-                map.removeLayer(articleMarkers.getMarkerLayer());
-                map.addLayer(projectMarkers.getMarkerLayer());
+                map.removeLayer(articleMarkers);
+                map.removeLayer(earthquakeMarkers);
+                map.addLayer(projectMarkers);
                 projectsDiv.show();
                 articlesDiv.hide();
             }
             else if (this.id == 'tab-earthquakes') {
-                map.removeLayer(articleMarkers.getMarkerLayer());
-                map.removeLayer(projectMarkers.getMarkerLayer());
+                map.removeLayer(articleMarkers);
+                map.removeLayer(projectMarkers);
             }
         });
 
@@ -112,11 +114,16 @@ var app = (function($, L, document) {
         .then(function() {
             sideBarLists.sortByDate();
             if  ($('#tab-articles').is(':checked')) {
-                map.addLayer(articleMarkers.getMarkerLayer());
+                map.addLayer(articleMarkers);
             }
         })
         .fail(function() {
             sideBarLists.displayArticlesError();
+        });
+
+        services.fetchEarthquakesData()
+        .done(function(data) {
+            earthquakeMarkers.addData(data);
         });
     }
 
