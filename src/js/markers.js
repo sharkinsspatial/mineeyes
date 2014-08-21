@@ -80,9 +80,30 @@ var markers = (function($, L, document) {
         this._markerMap[index] = marker;
     };
 
+    function EarthquakeMarkers() {
+        var earthquakeMarkers = L.GeoJSON.extend({
+            _markerMap: {},
+            initialize: function(data, options) {
+                L.GeoJSON.prototype.initialize.call(this,data, {
+                    onEachFeature: L.Util.bind(this._onEachFeature, this)
+                });
+            },
+            options: {
+                    pointToLayer: function(feature, latlng) {
+                        return L.circleMarker(latlng, {radius: 10});
+                    }
+                },
+                _onEachFeature: function(feature, layer) {
+                    this._markerMap[feature.id] = layer;
+                }
+            });
+            return new earthquakeMarkers(null);
+    }
+
     return {
         ProjectMarkers: ProjectMarkers,
-        ArticleMarkers: ArticleMarkers
-   };
+        ArticleMarkers: ArticleMarkers,
+        EarthquakeMarkers: EarthquakeMarkers
+    };
 
 })($, L, this.document);
