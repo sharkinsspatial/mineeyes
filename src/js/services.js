@@ -52,8 +52,15 @@ var services = (function() {
         return $.getJSON(buildProjectsUrl());
     }
 
+    function fetchEarthquakesData() {
+        return $.getJSON(
+            '/data/earthquakes.geojson'
+        );
+    }
+
     return {
         fetchNewsData: fetchNewsData,
-        fetchProjectsData: fetchProjectsData
+        fetchProjectsData: fetchProjectsData,
+        fetchEarthquakesData: fetchEarthquakesData
     };
 })();
