@@ -17,17 +17,17 @@ var markers = (function($, L, document) {
             }
         }
     };
-
-    function ProjectMarkers() {
-        var projectMarkers = L.MarkerClusterGroup.extend({
-            includes: clusterMarkers,
-            initialize: function(options) {
+    var initialize = function(options) {
                 this._markerMap = {};
                 this._defaultIcon = new L.Icon.Default();
                 this._activeIcon = new L.Icon.Default({iconUrl: 
                                              './images/marker-icon-red.png'});
                 L.MarkerClusterGroup.prototype.initialize.call(this, options);        
-            },
+    };
+    function ProjectMarkers() {
+        var projectMarkers = L.MarkerClusterGroup.extend({
+            includes: clusterMarkers,
+            initialize: initialize,
             addMarkers: function(geojson) {
                 var that = this;
                 var geoJsonLayer = L.geoJson(geojson, { 
@@ -45,19 +45,14 @@ var markers = (function($, L, document) {
                 this.addLayer(geoJsonLayer);
             }
         });
-        return new projectMarkers();
+        return new projectMarkers({spiderfyDistanceMultiplier:1,
+                                  showCoverageOnHover:false});
     }
 
     function ArticleMarkers() {
         var articleMarkers = L.MarkerClusterGroup.extend({
             includes: clusterMarkers,
-            initialize: function(options) {
-                this._markerMap = {};
-                this._defaultIcon = new L.Icon.Default();
-                this._activeIcon = new L.Icon.Default({iconUrl: 
-                                             './images/marker-icon-red.png'});
-                L.MarkerClusterGroup.prototype.initialize.call(this, options);        
-            },
+            initialize: initialize,
             addMarker: function(index, lat, lon) {
                 var latlng = new L.LatLng(lat, lon);
                 var marker = L.marker(latlng, {id: index});
@@ -70,7 +65,8 @@ var markers = (function($, L, document) {
                 this.addLayer(marker);
             }
         });
-        return new articleMarkers();
+        return new articleMarkers({spiderfyDistanceMultiplier:1,
+                                  showCoverageOnHover:false});
     }
 
     function EarthquakeMarkers() {
