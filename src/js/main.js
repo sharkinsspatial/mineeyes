@@ -78,12 +78,9 @@ var app = (function($, L, document) {
             $('#sidebar').toggleClass('active');
         });
 
-        $(document).on('earthquakesActivated', function(e, id) {
-            console.log(id);
-            var latlng = earthquakeMarkers.activateMarker(id, 100000);
-            map.setView(latlng, 10);
+        $(document).on('earthquakeDistanceSliderMove', function(e, id, radius) {
+            earthquakeMarkers.changeMarkerRadius(id, radius);
         });
-                 
         $("input[name='radio']").on('change', function() {
             if (this.id == 'tab-articles') {
                 map.addLayer(articleMarkers);

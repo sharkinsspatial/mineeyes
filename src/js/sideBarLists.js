@@ -86,17 +86,27 @@ var sideBarLists = (function() {
                 'datetime': time
             });
             var sliderDiv = $('<div/>').addClass('slider');
+            var damageDistanceSpan = $('<span/>').addClass('sub');
+            var damageUnitsSpan = $('<span/>').addClass('sub').text('KM');
             sliderDiv.slider({
                     orientation: 'horizontal',
                     range: 'min',
                     value: 1,
-                    min: 1,
-                    max: 20,
-                    slide: function(event, ui) {
+                    min: 10,
+                    max: 500,
+                    slide: function(e, ui) {
+                        damageDistanceSpan.text(ui.value);
+                        var id = $(e.target).parent().attr('id');
+                        var event = 'earthquakeDistanceSliderMove';
+                        var distanceMeters = ui.value * 1000;
+                        $(document).trigger(event, [id, distanceMeters]);
                     }
             });
+            damageDistanceSpan.text(sliderDiv.slider('value'));
             listItem.append(titleSpan);
             listItem.append(sliderDiv);
+            listItem.append(damageUnitsSpan);
+            listItem.append(damageDistanceSpan);
             listItem.on('click', click);
             _earthquakesList.append(listItem);
         });
