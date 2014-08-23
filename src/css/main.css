@@ -52,6 +52,13 @@ li span {
     float: left;
     padding-top: 0.2em;
 }
+li .earthquaketitle {
+    padding-bottom: 0.5em;
+}
+li .slider {
+    font-size: 0.5em;
+    clear: left;
+}
 li a, li .sub{
     font-size: 80%;
     color: #999;
@@ -60,6 +67,7 @@ li a, li .sub{
     clear: left;
     margin-top: 0.1em;
 }
+
 li a:hover {
     text-decoration: underline;
 }
@@ -186,12 +194,15 @@ li.active a, li.active .sub {
     padding-top: 5px;
     border: 1px solid #B9C0C5; 
 }
+.splitContent {
+    height: 50%;
+}
 [type=radio]:checked ~ label {
     background: #f4f4f4;
     border-bottom: 0.05em solid #f4f4f4;
-    z-index: 2;
+    z-index: 20;
 }
 [type=radio]:checked ~ label ~ .content {
-    z-index: 1;
+    z-index: 10;
 }
 

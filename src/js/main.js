@@ -77,6 +77,12 @@ var app = (function($, L, document) {
             projectMarkers.activateMarker(id);
             $('#sidebar').toggleClass('active');
         });
+
+        $(document).on('earthquakesActivated', function(e, id) {
+            console.log(id);
+            var latlng = earthquakeMarkers.activateMarker(id, 100000);
+            map.setView(latlng, 10);
+        });
                  
         $("input[name='radio']").on('change', function() {
             if (this.id == 'tab-articles') {
@@ -96,6 +102,7 @@ var app = (function($, L, document) {
             else if (this.id == 'tab-earthquakes') {
                 map.removeLayer(articleMarkers);
                 map.removeLayer(projectMarkers);
+                map.addLayer(earthquakeMarkers);
             }
         });
 
@@ -124,6 +131,7 @@ var app = (function($, L, document) {
         services.fetchEarthquakesData()
         .done(function(data) {
             earthquakeMarkers.addData(data);
+            sideBarLists.addEarthquakeListItems(data);
         });
     }
 

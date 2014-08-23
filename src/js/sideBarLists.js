@@ -1,9 +1,11 @@
 var sideBarLists = (function() {
     var _projectsList = $('<ul/>', {'id': 'projectslist'});
     var _articlesList = $('<ul/>', {'id': 'articleslist'});
+    var _earthquakesList = $('<ul/>', {'id': 'earthquakesList'});
     function init() {
         $('#projects').append(_projectsList);
         $('#articles').append(_articlesList);
+        $('#earthquakes').append(_earthquakesList);
     }
 
     function addProjectListItem(geojson) {
@@ -69,6 +71,37 @@ var sideBarLists = (function() {
         _articlesList.append(listItem);
     }
 
+    function addEarthquakeListItems(data) {
+        $.each(data.features, function(index, feature) {
+            var titleComponents = feature.properties.title.split(' - ');
+            var time = new Date(feature.properties.time);
+            var magnitudeSpan = $('<span/>', {
+                html: feature.properties.mag
+            });
+            var titleSpan = $('<span/>', {
+                html: titleComponents[1]
+            }).addClass('earthquaketitle');
+            var listItem = $('<li/>', {
+                'id': feature.id,
+                'datetime': time
+            });
+            var sliderDiv = $('<div/>').addClass('slider');
+            sliderDiv.slider({
+                    orientation: 'horizontal',
+                    range: 'min',
+                    value: 1,
+                    min: 1,
+                    max: 20,
+                    slide: function(event, ui) {
+                    }
+            });
+            listItem.append(titleSpan);
+            listItem.append(sliderDiv);
+            listItem.on('click', click);
+            _earthquakesList.append(listItem);
+        });
+    }
+    
     function deactivatePrevious(id, source) {
         var selector = '#' + source + ' li.active'; 
         var event = source + 'Deactivated';
@@ -161,6 +194,7 @@ var sideBarLists = (function() {
         init: init,
         addArticleListItem: addArticleListItem,
         addProjectListItem: addProjectListItem,
+        addEarthquakeListItems: addEarthquakeListItems,
         sortByAlpha: sortByAlpha,
         sortByDate: sortByDate,
         scrollTo: scrollTo,

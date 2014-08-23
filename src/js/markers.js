@@ -79,11 +79,17 @@ var markers = (function($, L, document) {
             },
             options: {
                     pointToLayer: function(feature, latlng) {
-                        return L.circleMarker(latlng, {radius: 10});
+                        L.circle(latlng, 50000);
+                        return L.circle(latlng, 50000);
                     }
                 },
                 _onEachFeature: function(feature, layer) {
                     this._markerMap[feature.id] = layer;
+                },
+                activateMarker: function(id, radius) {
+                    var layer = this._markerMap[id];
+                    layer.setRadius(radius);
+                    return layer.getLatLng();
                 }
             });
             return new earthquakeMarkers(null);
