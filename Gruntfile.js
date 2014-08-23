@@ -35,6 +35,8 @@ module.exports = function(grunt) {
                         {selector: 'head',
                             html: "<script src='//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js'></script>"},
                         {selector: 'head',
+                            html: "<script src='//ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/jquery-ui.min.js'></script>"},
+                        {selector: 'head',
                             html:  "<script src='//api.tiles.mapbox.com/mapbox.js/v1.6.2/mapbox.js'></script>"},
                         {selector: 'head',
                             html: "<script src='js/app-min.js'></script>"},
@@ -42,6 +44,8 @@ module.exports = function(grunt) {
                             html: "<link href='//api.tiles.mapbox.com/mapbox.js/v1.6.2/mapbox.css' rel='stylesheet' />"},
                         {selector: 'head',
                             html: "<link href='css/app-min.css' rel='stylesheet'>"},
+                        {selector: 'head',
+                            html: "<link href='//ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/themes/smoothness/jquery-ui.css' rel='stylesheet'/>"}
                     ]
                 },
                 src: 'src/index.html',
@@ -63,12 +67,17 @@ module.exports = function(grunt) {
         copy: {
           images: {
             files: [
-              {expand: true, cwd: 'src', src: ['images/*'], dest: 'dist', filter: 'isFile'},
+              {expand: true, cwd: 'src', src: ['images/*'], dest: 'dist', filter: 'isFile'}
             ]
           },
           fonts: {
               files: [
-                  {expand: true, cwd: 'src/css', src: ['fonts/*'], dest: 'dist/css', filter: 'isFile'},
+                  {expand: true, cwd: 'src/css', src: ['fonts/*'], dest: 'dist/css', filter: 'isFile'}
+              ]
+          },
+          data: {
+              files: [
+                  {expand: true, cwd: 'src', src: ['data/*'], dest: 'dist', filter: 'isFile'}
               ]
           }
         },
@@ -106,6 +115,10 @@ module.exports = function(grunt) {
                     {
                         src: 'dist/images/*',
                         dest: 'images'
+                    },
+                    {
+                        src: 'dist/data/*',
+                        dest: 'data'
                     }
                 ]
               }
