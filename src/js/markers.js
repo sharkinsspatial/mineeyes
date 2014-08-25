@@ -83,12 +83,21 @@ var markers = (function($, L, document) {
                     }
                 },
                 _onEachFeature: function(feature, layer) {
+                    layer.options.id = feature.id;
                     this._markerMap[feature.id] = layer;
+                    layer.on('click', function() {
+                        $(document).trigger('earthquakeMarkerClick', [this.options.id]);
+                    });
                 },
-                changeMarkerRadius: function(id, radius) {
+                activateMarker: function(id, radius) {
+                    var activeMarker = this._markerMap[id];
+                    activeMarker.setRadius(radius);
+                    activeMarker._map.fitBounds(activeMarker.getBounds());
+                },
+                deactivateMarker: function(id) {
                     var layer = this._markerMap[id];
-                    layer.setRadius(radius);
-                }
+                    layer.setRadius(10000);
+                } 
             });
             return new earthquakeMarkers(null);
     }

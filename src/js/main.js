@@ -59,6 +59,10 @@ var app = (function($, L, document) {
         $(document).on('projectMarkerClick', function(e, id) {
             sideBarLists.scrollTo(id, 'projects');
         });
+
+        $(document).on('earthquakeMarkerClick', function(e, id) {
+            sideBarLists.scrollTo(id, 'earthquakes');
+        });
         
         $(document).on('articlesDeactivated', function(e, id) {
             articleMarkers.deactivateMarker(id);
@@ -78,9 +82,15 @@ var app = (function($, L, document) {
             $('#sidebar').toggleClass('active');
         });
 
-        $(document).on('earthquakeDistanceSliderMove', function(e, id, radius) {
-            earthquakeMarkers.changeMarkerRadius(id, radius);
+        $(document).on('earthquakesActivated', function(e, id, radius) {
+            earthquakeMarkers.activateMarker(id, radius);
+            $('#sidebar').toggleClass('active');
         });
+
+        $(document).on('earthquakeDistanceSliderChange', function(e, id, radius) {
+            earthquakeMarkers.activateMarker(id, radius); 
+        });
+
         $("input[name='radio']").on('change', function() {
             if (this.id == 'tab-articles') {
                 map.addLayer(articleMarkers);

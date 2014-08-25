@@ -1,7 +1,7 @@
-var sideBarLists = (function() {
+var sideBarLists = (function($, L, document) {
     var _projectsList = $('<ul/>', {'id': 'projectslist'});
     var _articlesList = $('<ul/>', {'id': 'articleslist'});
-    var _earthquakesList = $('<ul/>', {'id': 'earthquakesList'});
+    var _earthquakesList = $('<ul/>', {'id': 'earthquakeslist'});
     function init() {
         $('#projects').append(_projectsList);
         $('#articles').append(_articlesList);
@@ -87,25 +87,24 @@ var sideBarLists = (function() {
             });
             var sliderDiv = $('<div/>').addClass('slider');
             var damageDistanceSpan = $('<span/>').addClass('sub');
-            var damageUnitsSpan = $('<span/>').addClass('sub').text('KM');
             sliderDiv.slider({
                     orientation: 'horizontal',
                     range: 'min',
                     value: 1,
                     min: 10,
                     max: 500,
-                    slide: function(e, ui) {
-                        damageDistanceSpan.text(ui.value);
+                    change: function(e, ui) {
+                        damageDistanceSpan.text(ui.value + ' KM');
                         var id = $(e.target).parent().attr('id');
-                        var event = 'earthquakeDistanceSliderMove';
+                        var event = 'earthquakeDistanceSliderChange';
                         var distanceMeters = ui.value * 1000;
                         $(document).trigger(event, [id, distanceMeters]);
                     }
             });
-            damageDistanceSpan.text(sliderDiv.slider('value'));
+            sliderDiv.slider('disable');
+            damageDistanceSpan.text(sliderDiv.slider('value') + ' KM');
             listItem.append(titleSpan);
             listItem.append(sliderDiv);
-            listItem.append(damageUnitsSpan);
             listItem.append(damageDistanceSpan);
             listItem.on('click', click);
             _earthquakesList.append(listItem);
@@ -118,6 +117,10 @@ var sideBarLists = (function() {
         var previousActiveLi = $(selector);
         var previousActiveLiId = previousActiveLi.attr('id');
         if (id != previousActiveLiId) {
+            var sliderDiv = previousActiveLi.children('div').first();
+            sliderDiv.slider('value', 10);
+            sliderDiv.slider('disable');
+
             $(document).trigger(event,
                                 previousActiveLiId);
             previousActiveLi.removeClass('active');
@@ -140,12 +143,15 @@ var sideBarLists = (function() {
     
     function click(e) { 
         var source = $(e.target).parent().closest('div').attr('id');
-        var id = $(e.target).attr('id');
+        var id = $(e.target).closest('li').attr('id');
         deactivatePrevious(id, source);
         var event = source + 'Activated';
         var activeLi = $(this);
         activeLi.addClass('active');
-        $(document).trigger(event, [activeLi.attr('id')]);
+        var sliderDiv = activeLi.children('div').first();
+        sliderDiv.slider('enable');
+        var distanceMeters = sliderDiv.slider('value') * 1000;
+        $(document).trigger(event, [activeLi.attr('id'), distanceMeters]);
     }
     
     function sortByAlpha() {
@@ -211,4 +217,4 @@ var sideBarLists = (function() {
         displayProjectsError: displayProjectsError,
         displayArticlesError: displayArticlesError
     };
-})();
+})($, L, this.document);
