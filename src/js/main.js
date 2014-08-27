@@ -81,14 +81,13 @@ var app = (function($, L, document) {
             projectMarkers.activateMarker(id);
             $('#sidebar').toggleClass('active');
         });
-
-        $(document).on('earthquakesActivated', function(e, id, radius) {
-            earthquakeMarkers.activateMarker(id, radius);
-            $('#sidebar').toggleClass('active');
+        
+        $(document).on('earthquakesActivated', function(e, id) {
+            earthquakeMarkers.activateMarker(id);
         });
 
         $(document).on('earthquakeDistanceSliderChange', function(e, id, radius) {
-            earthquakeMarkers.activateMarker(id, radius); 
+            earthquakeMarkers.changeMarkerRadius(id, radius); 
         });
 
         $("input[name='radio']").on('change', function() {

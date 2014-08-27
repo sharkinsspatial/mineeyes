@@ -89,15 +89,14 @@ var markers = (function($, L, document) {
                         $(document).trigger('earthquakeMarkerClick', [this.options.id]);
                     });
                 },
-                activateMarker: function(id, radius) {
+                changeMarkerRadius: function(id, radius) {
                     var activeMarker = this._markerMap[id];
                     activeMarker.setRadius(radius);
-                    activeMarker._map.fitBounds(activeMarker.getBounds());
                 },
-                deactivateMarker: function(id) {
-                    var layer = this._markerMap[id];
-                    layer.setRadius(10000);
-                } 
+                activateMarker: function(id) {
+                    var activeMarker = this._markerMap[id];
+                    activeMarker._map.fitBounds(activeMarker.getBounds());
+                }
             });
             return new earthquakeMarkers(null);
     }

@@ -2,6 +2,9 @@ var sideBarLists = (function($, L, document) {
     var _projectsList = $('<ul/>', {'id': 'projectslist'});
     var _articlesList = $('<ul/>', {'id': 'articleslist'});
     var _earthquakesList = $('<ul/>', {'id': 'earthquakeslist'});
+    var _metersConversionConstant = 1000;
+    var _sliderMinimumDistanceConstant = 10;
+
     function init() {
         $('#projects').append(_projectsList);
         $('#articles').append(_articlesList);
@@ -91,14 +94,19 @@ var sideBarLists = (function($, L, document) {
                     orientation: 'horizontal',
                     range: 'min',
                     value: 1,
-                    min: 10,
+                    min: _sliderMinimumDistanceConstant,
                     max: 500,
                     change: function(e, ui) {
                         damageDistanceSpan.text(ui.value + ' KM');
                         var id = $(e.target).parent().attr('id');
                         var event = 'earthquakeDistanceSliderChange';
-                        var distanceMeters = ui.value * 1000;
+                        var distanceMeters = ui.value * _metersConversionConstant;
                         $(document).trigger(event, [id, distanceMeters]);
+                    },
+                    stop: function(e, ui) {
+                        var id = $(e.target).parent().attr('id');
+                        var event = 'earthquakeDistanceSliderStop';
+                        $(document).trigger(event, [id]);
                     }
             });
             sliderDiv.slider('disable');
@@ -118,11 +126,10 @@ var sideBarLists = (function($, L, document) {
         var previousActiveLiId = previousActiveLi.attr('id');
         if (id != previousActiveLiId) {
             var sliderDiv = previousActiveLi.children('div').first();
-            sliderDiv.slider('value', 10);
             sliderDiv.slider('disable');
+            sliderDiv.slider('value', _sliderMinimumDistanceConstant);
 
-            $(document).trigger(event,
-                                previousActiveLiId);
+            $(document).trigger(event, previousActiveLiId);
             previousActiveLi.removeClass('active');
         }
     }
@@ -134,6 +141,8 @@ var sideBarLists = (function($, L, document) {
         var div = $(divSelector);
         var activeLi = $(activeSelector);
         activeLi.addClass('active');
+        var sliderDiv = activeLi.children('div').first();
+        sliderDiv.slider('enable');
         div.scrollTop(8);
         div.animate({
             duration: 'slow',
@@ -150,8 +159,7 @@ var sideBarLists = (function($, L, document) {
         activeLi.addClass('active');
         var sliderDiv = activeLi.children('div').first();
         sliderDiv.slider('enable');
-        var distanceMeters = sliderDiv.slider('value') * 1000;
-        $(document).trigger(event, [activeLi.attr('id'), distanceMeters]);
+        $(document).trigger(event, [activeLi.attr('id')]);
     }
     
     function sortByAlpha() {
