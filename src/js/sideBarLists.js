@@ -102,11 +102,11 @@ var sideBarLists = (function($, L, document) {
                         var event = 'earthquakeDistanceSliderChange';
                         var distanceMeters = ui.value * _metersConversionConstant;
                         $(document).trigger(event, [id, distanceMeters]);
-                    },
-                    stop: function(e, ui) {
-                        var id = $(e.target).parent().attr('id');
-                        var event = 'earthquakeDistanceSliderStop';
-                        $(document).trigger(event, [id]);
+                        //Hack for manual manipulation of slider
+                        if (e.originalEvent) {
+                            var activateEvent = 'earthquakesActivated';
+                            $(document).trigger(activateEvent, [id]);
+                        }
                     }
             });
             sliderDiv.slider('disable');
