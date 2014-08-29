@@ -4,7 +4,9 @@ var app = (function($, L, document) {
         articleMarkers = new markers.ArticleMarkers();
         projectMarkers = new markers.ProjectMarkers();
         earthquakeMarkers = new markers.EarthquakeMarkers();
-        var map = L.mapbox.map('map', 'sharkins.map-uwias8cf', {maxZoom:12});
+        filteredProjectMarkers = null;
+        projectData = null;
+        map = L.mapbox.map('map', 'sharkins.map-uwias8cf', {maxZoom:12});
         map.on('ready', function() {
             var miniMap = new L.Control.MiniMap(L.mapbox.tileLayer(
                 'sharkins.hc52c67l'), {position: 'bottomleft'})
@@ -60,6 +62,10 @@ var app = (function($, L, document) {
             sideBarLists.scrollTo(id, 'projects');
         });
 
+        $(document).on('filteredProjectMarkerClick', function(e, id) {
+            sideBarLists.scrollTo(id, 'filteredProjects');
+        });
+
         $(document).on('earthquakeMarkerClick', function(e, id) {
             sideBarLists.scrollTo(id, 'earthquakes');
         });
@@ -70,6 +76,12 @@ var app = (function($, L, document) {
 
         $(document).on('projectsDeactivated', function(e, id) {
             projectMarkers.deactivateMarker(id);
+        });
+
+        $(document).on('earthquakesDeactivated', function(e, id) {
+            if (filteredProjectMarkers) {
+                map.removeLayer(filteredProjectMarkers);
+            }
         });
         
         $(document).on('articlesActivated', function(e, id) { 
@@ -83,13 +95,20 @@ var app = (function($, L, document) {
         });
         
         $(document).on('earthquakesActivated', function(e, id) {
-            earthquakeMarkers.activateMarker(id);
+            var circle = earthquakeMarkers.activateMarker(id);
+            if (filteredProjectMarkers) {
+                map.removeLayer(filteredProjectMarkers);
+            }
+            filteredProjectMarkers = new markers.FilteredProjectMarkers(projectData,
+                                                                    circle);
+            map.addLayer(filteredProjectMarkers);
+
         });
 
         $(document).on('earthquakeDistanceSliderChange', function(e, id, radius) {
             earthquakeMarkers.changeMarkerRadius(id, radius); 
         });
-
+        
         $("input[name='radio']").on('change', function() {
             if (this.id == 'tab-articles') {
                 map.addLayer(articleMarkers);
@@ -154,6 +173,7 @@ var app = (function($, L, document) {
                     sideBarLists.addProjectListItem(feature);
             }
         });
+        projectData = geojson;
         projectMarkers.addMarkers(geojson);
         sideBarLists.sortByAlpha();
     }

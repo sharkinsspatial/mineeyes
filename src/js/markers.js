@@ -1,5 +1,5 @@
 var markers = (function($, L, document) {
-    var clusterMarkers = {
+    var clusterMarker = {
         _markerMap: null,
         _defaultIcon: null,
         _activeIcon: null,
@@ -26,7 +26,7 @@ var markers = (function($, L, document) {
     };
     function ProjectMarkers() {
         var projectMarkers = L.MarkerClusterGroup.extend({
-            includes: clusterMarkers,
+            includes: clusterMarker,
             initialize: initialize,
             addMarkers: function(geojson) {
                 var that = this;
@@ -51,7 +51,7 @@ var markers = (function($, L, document) {
 
     function ArticleMarkers() {
         var articleMarkers = L.MarkerClusterGroup.extend({
-            includes: clusterMarkers,
+            includes: clusterMarker,
             initialize: initialize,
             addMarker: function(index, lat, lon) {
                 var latlng = new L.LatLng(lat, lon);
@@ -69,10 +69,55 @@ var markers = (function($, L, document) {
                                   showCoverageOnHover:false});
     }
 
+    function FilteredProjectMarkers(data, circle) {
+        var filteredProjectMarkers = L.GeoJSON.extend({
+            options: {
+                filter: function(feature) {
+                    var latlng = circle.getLatLng();
+                    var radius = circle.getRadius();
+                    var filtered = latlng.distanceTo(L.latLng(
+                        feature.geometry.coordinates[1],
+                        feature.geometry.coordinates[0])) < radius;
+                    return filtered; 
+                }
+            },
+            initialize: function(data) {
+                this._markerMap = {};
+                this._defaultIcon = new L.Icon.Default();
+                this._activeIcon = new L.Icon.Default({iconUrl: 
+                                             './images/marker-icon-red.png'});
+                L.GeoJSON.prototype.initialize.call(this,data, {
+                    onEachFeature: L.Util.bind(this._onEachFeature, this)
+                });
+
+            },
+            _onEachFeature: function(feature, layer) {
+                layer.options.id = feature.id;
+                this._markerMap[feature.id] = layer;
+                var activeIcon = this._activeIcon;
+                layer.on('click', function() {
+                    this.setIcon(activeIcon);
+                    $(document).trigger('filteredProjectMarkerClick', [feature.id]);
+                });
+            },
+            activateMarker: function(id) {
+                var activeMarker = this._markerMap[id];
+                var activeIcon = this._activeIcon;
+            },
+            deactivateMarker: function(id) {
+                var previousActiveMarker = this._markerMap[id];  
+                if (previousActiveMarker) {
+                    previousActiveMarker.setIcon(this._defaultIcon);
+                }
+            }
+        });
+        return new filteredProjectMarkers(data, circle);
+    }
+
     function EarthquakeMarkers() {
         var earthquakeMarkers = L.GeoJSON.extend({
-            _markerMap: {},
             initialize: function(data, options) {
+                this._markerMap = {};
                 L.GeoJSON.prototype.initialize.call(this,data, {
                     onEachFeature: L.Util.bind(this._onEachFeature, this)
                 });
@@ -96,6 +141,7 @@ var markers = (function($, L, document) {
                 activateMarker: function(id) {
                     var activeMarker = this._markerMap[id];
                     activeMarker._map.fitBounds(activeMarker.getBounds());
+                    return activeMarker;
                 }
             });
             return new earthquakeMarkers(null);
@@ -104,6 +150,7 @@ var markers = (function($, L, document) {
     return {
         ProjectMarkers: ProjectMarkers,
         ArticleMarkers: ArticleMarkers,
-        EarthquakeMarkers: EarthquakeMarkers
+        EarthquakeMarkers: EarthquakeMarkers,
+        FilteredProjectMarkers: FilteredProjectMarkers
     };
 })($, L, this.document);
