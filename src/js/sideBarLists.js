@@ -2,16 +2,29 @@ var sideBarLists = (function($, L, document) {
     var _projectsList = $('<ul/>', {'id': 'projectslist'});
     var _articlesList = $('<ul/>', {'id': 'articleslist'});
     var _earthquakesList = $('<ul/>', {'id': 'earthquakeslist'});
+    var _filteredProjectsList = $('<ul/>', {'id': 'filteredprojectslist'});
     var _metersConversionConstant = 1000;
     var _sliderMinimumDistanceConstant = 10;
 
     function init() {
+        earthquakes = $('#earthquakes');
         $('#projects').append(_projectsList);
         $('#articles').append(_articlesList);
-        $('#earthquakes').append(_earthquakesList);
+        earthquakes.append(_earthquakesList);
+        $('#filteredprojects').append(_filteredProjectsList);
+        earthquakesLabel = $('#earthquakeslabel');
+        filteredprojectsLabel = $('#filteredprojectslabel');
     }
 
     function addProjectListItem(geojson) {
+        addProjectItem(geojson, _projectsList);
+    }
+
+    function addFilteredProjectListItem(geojson) {
+        addProjectItem(geojson, _filteredProjectsList);
+    }
+
+    function addProjectItem(geojson, ul) {
         function normalizeText(str) {
             var sentenceCase = str.replace(/\w\S*/g, 
                 function(results){return results.charAt(0).toUpperCase() + 
@@ -44,7 +57,8 @@ var sideBarLists = (function($, L, document) {
         });
         listItem.append(stateSpan);
         listItem.on('click', click);
-        _projectsList.append(listItem);
+        //_projectsList.append(listItem);
+        ul.append(listItem);
     }
     
     function addArticleListItem(index, xmlitem) {
@@ -135,6 +149,7 @@ var sideBarLists = (function($, L, document) {
     }
 
     function scrollTo(id, source) {
+        var scrollPosition = 0;
         deactivatePrevious(id, source);
         var divSelector = '#' + source;
         var activeSelector = '#' + source + 'list' + ' #' + id;
@@ -143,10 +158,22 @@ var sideBarLists = (function($, L, document) {
         activeLi.addClass('active');
         var sliderDiv = activeLi.children('div').first();
         sliderDiv.slider('enable');
-        div.scrollTop(8);
+        div.scrollTop(1);
+        scrollPosition = activeLi.position().top;
+        if (div.attr('id') == 'earthquakes') {
+            scrollPosition = activeLi.position().top - earthquakesLabel.outerHeight();
+            console.log(earthquakesLabel.outerHeight());
+            console.log(scrollPosition);
+        }
+        if (div.attr('id') == 'filteredprojects') {
+            var offsetHeight = filteredprojectsLabel.outerHeight() + 
+                earthquakes.outerHeight() + earthquakesLabel.outerHeight();
+            console.log(offsetHeight);
+            scrollPosition = activeLi.position().top - offsetHeight;
+        }
         div.animate({
             duration: 'slow',
-            scrollTop: activeLi.position().top
+            scrollTop: scrollPosition
         });
     }
     
@@ -218,6 +245,7 @@ var sideBarLists = (function($, L, document) {
         init: init,
         addArticleListItem: addArticleListItem,
         addProjectListItem: addProjectListItem,
+        addFilteredProjectListItem: addFilteredProjectListItem,
         addEarthquakeListItems: addEarthquakeListItems,
         sortByAlpha: sortByAlpha,
         sortByDate: sortByDate,

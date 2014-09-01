@@ -4,7 +4,7 @@ var app = (function($, L, document) {
         articleMarkers = new markers.ArticleMarkers();
         projectMarkers = new markers.ProjectMarkers();
         earthquakeMarkers = new markers.EarthquakeMarkers();
-        filteredProjectMarkers = null;
+        filteredProjectMarkers = new markers.FilteredProjectMarkers(null, null);
         projectData = null;
         map = L.mapbox.map('map', 'sharkins.map-uwias8cf', {maxZoom:12});
         map.on('ready', function() {
@@ -63,7 +63,7 @@ var app = (function($, L, document) {
         });
 
         $(document).on('filteredProjectMarkerClick', function(e, id) {
-            sideBarLists.scrollTo(id, 'filteredProjects');
+            sideBarLists.scrollTo(id, 'filteredprojects');
         });
 
         $(document).on('earthquakeMarkerClick', function(e, id) {
@@ -79,9 +79,7 @@ var app = (function($, L, document) {
         });
 
         $(document).on('earthquakesDeactivated', function(e, id) {
-            if (filteredProjectMarkers) {
-                map.removeLayer(filteredProjectMarkers);
-            }
+            map.removeLayer(filteredProjectMarkers);
         });
         
         $(document).on('articlesActivated', function(e, id) { 
@@ -96,13 +94,13 @@ var app = (function($, L, document) {
         
         $(document).on('earthquakesActivated', function(e, id) {
             var circle = earthquakeMarkers.activateMarker(id);
-            if (filteredProjectMarkers) {
-                map.removeLayer(filteredProjectMarkers);
-            }
-            filteredProjectMarkers = new markers.FilteredProjectMarkers(projectData,
-                                                                    circle);
+            map.removeLayer(filteredProjectMarkers);
+            filteredProjectMarkers = new markers.FilteredProjectMarkers(projectData, circle);
             map.addLayer(filteredProjectMarkers);
-
+            filteredProjectMarkers.eachLayer(function(layer) {
+                console.log(layer);
+                sideBarLists.addFilteredProjectListItem(layer.feature);
+            });
         });
 
         $(document).on('earthquakeDistanceSliderChange', function(e, id, radius) {
@@ -114,12 +112,14 @@ var app = (function($, L, document) {
                 map.addLayer(articleMarkers);
                 map.removeLayer(earthquakeMarkers);
                 map.removeLayer(projectMarkers);
+                map.removeLayer(filteredProjectMarkers);
                 articlesDiv.show();
                 projectsDiv.hide();
             }
             else if (this.id == 'tab-projects') {
                 map.removeLayer(articleMarkers);
                 map.removeLayer(earthquakeMarkers);
+                map.removeLayer(filteredProjectMarkers);
                 map.addLayer(projectMarkers);
                 projectsDiv.show();
                 articlesDiv.hide();
@@ -128,6 +128,7 @@ var app = (function($, L, document) {
                 map.removeLayer(articleMarkers);
                 map.removeLayer(projectMarkers);
                 map.addLayer(earthquakeMarkers);
+                map.addLayer(filteredProjectMarkers);
             }
         });
 

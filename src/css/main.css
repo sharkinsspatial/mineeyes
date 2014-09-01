@@ -190,12 +190,18 @@ li.active a, li.active .sub {
     background: #f4f4f4;
     overflow: auto;
 }
-.toppad {
-    padding-top: 5px;
-    border: 1px solid #B9C0C5; 
-}
 .splitContent {
-    height: 50%;
+    overflow: auto;
+    height: 40%;
+}
+.splitContentLabels {
+    height: 5%;
+    text-align: center;
+    padding-top: 8%;
+    font-weight: bold;
+    border-bottom-style: solid;
+    border-bottom-color: #B9C0C5;
+    border-bottom-width: 0.1em;
 }
 [type=radio]:checked ~ label {
     background: #f4f4f4;
