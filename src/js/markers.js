@@ -138,10 +138,13 @@ var markers = (function($, L, document) {
                     var activeMarker = this._markerMap[id];
                     activeMarker.setRadius(radius);
                 },
-                activateMarker: function(id) {
+                getActiveMarker: function(id) {
                     var activeMarker = this._markerMap[id];
-                    activeMarker._map.fitBounds(activeMarker.getBounds());
                     return activeMarker;
+                },
+                zoomToMarker: function(id) {
+                    var activeMarker = this._markerMap[id];
+                    activeMarker._map.fitBounds(activeMarker.getBounds(), {maxZoom: 8});
                 }
             });
             return new earthquakeMarkers(null);

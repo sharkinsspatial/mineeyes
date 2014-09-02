@@ -57,7 +57,6 @@ var sideBarLists = (function($, L, document) {
         });
         listItem.append(stateSpan);
         listItem.on('click', click);
-        //_projectsList.append(listItem);
         ul.append(listItem);
     }
     
@@ -116,10 +115,11 @@ var sideBarLists = (function($, L, document) {
                         var event = 'earthquakeDistanceSliderChange';
                         var distanceMeters = ui.value * _metersConversionConstant;
                         $(document).trigger(event, [id, distanceMeters]);
-                        //Hack for manual manipulation of slider
+                        //Hack for manual manipulation of slider or 
+                        //change event is triggered when slider is reset to 0.
                         if (e.originalEvent) {
-                            var activateEvent = 'earthquakesActivated';
-                            $(document).trigger(activateEvent, [id]);
+                            var manualEvent = 'earthquakeDistanceSliderManualChange';
+                            $(document).trigger(manualEvent, [id]);
                         }
                     }
             });
@@ -132,7 +132,11 @@ var sideBarLists = (function($, L, document) {
             _earthquakesList.append(listItem);
         });
     }
-    
+
+    function emptyFilteredProjects() {
+        _filteredProjectsList.empty();
+    }
+
     function deactivatePrevious(id, source) {
         var selector = '#' + source + ' li.active'; 
         var event = source + 'Deactivated';
@@ -162,13 +166,11 @@ var sideBarLists = (function($, L, document) {
         scrollPosition = activeLi.position().top;
         if (div.attr('id') == 'earthquakes') {
             scrollPosition = activeLi.position().top - earthquakesLabel.outerHeight();
-            console.log(earthquakesLabel.outerHeight());
-            console.log(scrollPosition);
+            $(document).trigger('earthquakesActivated', [activeLi.attr('id')]);
         }
         if (div.attr('id') == 'filteredprojects') {
             var offsetHeight = filteredprojectsLabel.outerHeight() + 
                 earthquakes.outerHeight() + earthquakesLabel.outerHeight();
-            console.log(offsetHeight);
             scrollPosition = activeLi.position().top - offsetHeight;
         }
         div.animate({
@@ -246,6 +248,7 @@ var sideBarLists = (function($, L, document) {
         addArticleListItem: addArticleListItem,
         addProjectListItem: addProjectListItem,
         addFilteredProjectListItem: addFilteredProjectListItem,
+        emptyFilteredProjects: emptyFilteredProjects,
         addEarthquakeListItems: addEarthquakeListItems,
         sortByAlpha: sortByAlpha,
         sortByDate: sortByDate,

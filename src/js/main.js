@@ -91,20 +91,30 @@ var app = (function($, L, document) {
             projectMarkers.activateMarker(id);
             $('#sidebar').toggleClass('active');
         });
-        
-        $(document).on('earthquakesActivated', function(e, id) {
-            var circle = earthquakeMarkers.activateMarker(id);
+       
+        function activateEarthquake(id) {
+            sideBarLists.emptyFilteredProjects();
+            var circle = earthquakeMarkers.getActiveMarker(id);
             map.removeLayer(filteredProjectMarkers);
             filteredProjectMarkers = new markers.FilteredProjectMarkers(projectData, circle);
             map.addLayer(filteredProjectMarkers);
             filteredProjectMarkers.eachLayer(function(layer) {
-                console.log(layer);
                 sideBarLists.addFilteredProjectListItem(layer.feature);
             });
+        }
+
+        $(document).on('earthquakesActivated', function(e, id) {
+            activateEarthquake(id);
+            earthquakeMarkers.zoomToMarker(id);
         });
 
         $(document).on('earthquakeDistanceSliderChange', function(e, id, radius) {
-            earthquakeMarkers.changeMarkerRadius(id, radius); 
+            earthquakeMarkers.changeMarkerRadius(id, radius);
+            activateEarthquake(id);
+        });
+
+        $(document).on('earthquakeDistanceSliderManualChange', function(e, id) {
+            earthquakeMarkers.zoomToMarker(id);
         });
         
         $("input[name='radio']").on('change', function() {
