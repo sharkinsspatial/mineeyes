@@ -77,6 +77,10 @@ var app = (function($, L, document) {
         $(document).on('projectsDeactivated', function(e, id) {
             projectMarkers.deactivateMarker(id);
         });
+        
+        $(document).on('filteredprojectsDeactivated', function(e, id) {
+            filteredProjectMarkers.deactivateMarker(id);
+        });
 
         $(document).on('earthquakesDeactivated', function(e, id) {
             map.removeLayer(filteredProjectMarkers);
@@ -90,6 +94,10 @@ var app = (function($, L, document) {
         $(document).on('projectsActivated', function(e, id) {
             projectMarkers.activateMarker(id);
             $('#sidebar').toggleClass('active');
+        });
+        
+        $(document).on('filteredprojectsActivated', function(e, id) {
+            filteredProjectMarkers.activateMarker(id);
         });
        
         function activateEarthquake(id) {

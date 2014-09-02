@@ -103,6 +103,7 @@ var markers = (function($, L, document) {
             activateMarker: function(id) {
                 var activeMarker = this._markerMap[id];
                 var activeIcon = this._activeIcon;
+                activeMarker.setIcon(activeIcon);
             },
             deactivateMarker: function(id) {
                 var previousActiveMarker = this._markerMap[id];  
