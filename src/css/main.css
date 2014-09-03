@@ -213,4 +213,6 @@ li.active a, li.active .sub {
 [type=radio]:checked ~ label ~ .content {
     z-index: 10;
 }
-
+.ui-slider .ui-slider-handle {
+    background: #8A969E;
+}
