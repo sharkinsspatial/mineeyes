@@ -114,6 +114,11 @@ li.active a, li.active .sub {
     right: 0.8em;
     z-index: 100;
 }
+#hideSidebar {
+    float: right;
+    padding-top: 5px;
+    padding-right: 10px;
+}
 @font-face {
 	font-family: 'mineeyes-fonts';
 	src:url('fonts/mineeyes-fonts.eot?-5uaslu');
@@ -156,9 +161,6 @@ li.active a, li.active .sub {
 .icon-earth:before {
     content: "\e605";
     font-size: 2em;
-    float: right;
-    padding-top: 5px;
-    padding-right: 10px;
 }
 
 .tabs {

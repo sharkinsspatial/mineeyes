@@ -52,6 +52,7 @@ var app = (function($, L, document) {
 
         $('#hideSidebar').click(function(e) {
             $('#sidebar').toggleClass('active');
+            e.stopPropagation();
         });
  
         $(document).on('articleMarkerClick', function(e, id) {
@@ -88,12 +89,10 @@ var app = (function($, L, document) {
         
         $(document).on('articlesActivated', function(e, id) { 
             articleMarkers.activateMarker(id);
-            $('#sidebar').toggleClass('active');
         }); 
 
         $(document).on('projectsActivated', function(e, id) {
             projectMarkers.activateMarker(id);
-            $('#sidebar').toggleClass('active');
         });
         
         $(document).on('filteredprojectsActivated', function(e, id) {
