@@ -119,11 +119,11 @@ var app = (function($, L, document) {
             earthquakeMarkers.changeMarkerRadius(id, radius);
             activateEarthquake(id);
         });
-
+        
         $(document).on('earthquakeDistanceSliderManualChange', function(e, id) {
             earthquakeMarkers.zoomToMarker(id);
         });
-        
+
         $("input[name='radio']").on('change', function() {
             if (this.id == 'tab-articles') {
                 map.addLayer(articleMarkers);

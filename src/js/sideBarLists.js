@@ -101,32 +101,37 @@ var sideBarLists = (function($, L, document) {
                 'id': feature.id,
                 'datetime': time
             });
-            var sliderDiv = $('<div/>').addClass('slider');
-            var damageDistanceSpan = $('<span/>').addClass('sub');
-            sliderDiv.slider({
-                    orientation: 'horizontal',
-                    range: 'min',
-                    value: 1,
-                    min: _sliderMinimumDistanceConstant,
-                    max: 500,
-                    change: function(e, ui) {
-                        damageDistanceSpan.text(ui.value + ' KM');
-                        var id = $(e.target).parent().attr('id');
-                        var event = 'earthquakeDistanceSliderChange';
-                        var distanceMeters = ui.value * _metersConversionConstant;
-                        $(document).trigger(event, [id, distanceMeters]);
-                        //Hack for manual manipulation of slider or 
-                        //change event is triggered when slider is reset to 0.
-                        if (e.originalEvent) {
-                            var manualEvent = 'earthquakeDistanceSliderManualChange';
-                            $(document).trigger(manualEvent, [id]);
-                        }
-                    }
+
+            var slider = $('<input>', {
+                type: 'range',
+                min: _sliderMinimumDistanceConstant,
+                max: 500,
+                step: 1,
+                value: _sliderMinimumDistanceConstant
             });
-            sliderDiv.slider('disable');
-            damageDistanceSpan.text(sliderDiv.slider('value') + ' KM');
+            slider.on('change', function(e) {
+                var value = this.value;
+                damageDistanceSpan.text(value + ' KM');
+                var id = $(e.target).parent().attr('id');
+                var event = 'earthquakeDistanceSliderChange';
+                var distanceMeters = value * _metersConversionConstant;
+                $(document).trigger(event, [id, distanceMeters]);
+                //Hack for manual manipulation of slider or 
+                //change event is triggered when slider is reset to 0.
+                if (e.originalEvent) {
+                    var manualEvent = 'earthquakeDistanceSliderManualChange';
+                    $(document).trigger(manualEvent, [id]);
+                }
+            });
+            slider.on('click', function(e) {
+                e.stopPropagation();
+            });
+            slider.prop('disabled', true);
+
+            var damageDistanceSpan = $('<span/>').addClass('sub');
+            damageDistanceSpan.text(slider.val() + ' KM');
             listItem.append(titleSpan);
-            listItem.append(sliderDiv);
+            listItem.append(slider);
             listItem.append(damageDistanceSpan);
             listItem.on('click', click);
             _earthquakesList.append(listItem);
@@ -143,10 +148,9 @@ var sideBarLists = (function($, L, document) {
         var previousActiveLi = $(selector);
         var previousActiveLiId = previousActiveLi.attr('id');
         if (id != previousActiveLiId) {
-            var sliderDiv = previousActiveLi.children('div').first();
-            sliderDiv.slider('disable');
-            sliderDiv.slider('value', _sliderMinimumDistanceConstant);
-
+            var slider = previousActiveLi.children('input').first();
+            slider.val(_sliderMinimumDistanceConstant).trigger('change');
+            slider.prop('disabled', true);
             $(document).trigger(event, previousActiveLiId);
             previousActiveLi.removeClass('active');
         }
@@ -160,8 +164,8 @@ var sideBarLists = (function($, L, document) {
         var div = $(divSelector);
         var activeLi = $(activeSelector);
         activeLi.addClass('active');
-        var sliderDiv = activeLi.children('div').first();
-        sliderDiv.slider('enable');
+        var slider = activeLi.children('input').first();
+        slider.prop('disabled', false);
         div.scrollTop(1);
         scrollPosition = activeLi.position().top;
         if (div.attr('id') == 'earthquakes') {
@@ -186,8 +190,8 @@ var sideBarLists = (function($, L, document) {
         var event = source + 'Activated';
         var activeLi = $(this);
         activeLi.addClass('active');
-        var sliderDiv = activeLi.children('div').first();
-        sliderDiv.slider('enable');
+        var slider = activeLi.children('input').first();
+        slider.prop('disabled', false);
         $(document).trigger(event, [activeLi.attr('id')]);
     }
     

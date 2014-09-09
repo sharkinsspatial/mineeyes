@@ -55,9 +55,8 @@ li span {
 li .earthquaketitle {
     padding-bottom: 0.5em;
 }
-li .slider {
-    font-size: 0.5em;
-    clear: left;
+li input {
+    width: 100%
 }
 li a, li .sub{
     font-size: 80%;
@@ -213,6 +212,4 @@ li.active a, li.active .sub {
 [type=radio]:checked ~ label ~ .content {
     z-index: 10;
 }
-.ui-slider .ui-slider-handle {
-    background: #8A969E;
-}
+
