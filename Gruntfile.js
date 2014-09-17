@@ -16,7 +16,8 @@ module.exports = function(grunt) {
                     'src/js/vendor/leaflet.markercluster.js',
                     'src/js/vendor/terraformer.min.js',
                     'src/js/vendor/terraformer-arcgis-parser.min.js',
-                    'src/js/vendor/jquery-1.11.0.min.js'
+                    'src/js/vendor/jquery-1.11.0.min.js',
+                    'src/js/vendor/jquery-ui-1.11.0.min.js'
                 ],
                 helpers: 'spec/helpers/*.js'
             }

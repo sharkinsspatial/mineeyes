@@ -31,6 +31,14 @@ html, body {
 #sidebar.active {
     right: 0;
 }
+#projectssearch {
+    width: 90%;
+    margin-right: 4%;
+    margin-left: 4%;
+    margin-top: 3%;
+    font-family: inherit;
+    font-size: 0.8em;
+}
 ul {
     padding: 0;
 }
@@ -56,9 +64,13 @@ li .earthquaketitle {
     padding-bottom: 0.5em;
 }
 li input {
-    width: 100%
+    width: 100%;
 }
-li a, li .sub{
+.ui-autocomplete {
+    font-family: inherit;
+    font-size: 1em;
+}
+li a, li .sub {
     font-size: 80%;
     color: #999;
     text-decoration: none;

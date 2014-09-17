@@ -3,9 +3,10 @@ var sideBarLists = (function($, L, document) {
     var _articlesList = $('<ul/>', {'id': 'articleslist'});
     var _earthquakesList = $('<ul/>', {'id': 'earthquakeslist'});
     var _filteredProjectsList = $('<ul/>', {'id': 'filteredprojectslist'});
+    var _projectssearch = $('<input/>', {'id': 'projectssearch'});
     var _metersConversionConstant = 1000;
     var _sliderMinimumDistanceConstant = 10;
-    var autoCompleteSource = [];
+    var _projectssearchSource = [];
 
     function init() {
         earthquakes = $('#earthquakes');
@@ -59,10 +60,6 @@ var sideBarLists = (function($, L, document) {
         listItem.append(stateSpan);
         listItem.on('click', click);
         ul.append(listItem);
-        autoCompleteSource.push({
-            label: company,
-            value: geojson.properties.OBJECTID
-        });
     }
     
     function addArticleListItem(index, xmlitem) {
@@ -220,6 +217,10 @@ var sideBarLists = (function($, L, document) {
                 return compare;
             }).each(function() {
                 list.append(this);
+                _projectssearchSource.push({
+                    label: this.innerText,
+                    value: this.id
+                });
             });
         }
     }
@@ -260,17 +261,17 @@ var sideBarLists = (function($, L, document) {
                     return matcher.test(value.label || value.value || value);
                 });
         };
-        var input = $('<input/>');
-        input.autocomplete({source: autoCompleteSource});
-        input.on('autocompleteselect', function(event, ui){
+        _projectssearch.autocomplete({source: _projectssearchSource});
+        _projectssearch.on('autocompleteselect', function(event, ui){
             scrollTo(ui.item.value, 'projects');
-            input.val(ui.item.label);
+            $(document).trigger('projectsActivated', [ui.item.value]);
+            _projectssearch.val(ui.item.label);
             return false;
         });
-        input.on('autocompletefocus', function(event, ui){
+        _projectssearch.on('autocompletefocus', function(event, ui){
             return false;
         });
-        $('#projectscontainer').prepend(input);
+        $('#projectscontainer').prepend(_projectssearch);
     }
 
     return {
