@@ -5,6 +5,7 @@ var sideBarLists = (function($, L, document) {
     var _filteredProjectsList = $('<ul/>', {'id': 'filteredprojectslist'});
     var _metersConversionConstant = 1000;
     var _sliderMinimumDistanceConstant = 10;
+    var autoCompleteSource = [];
 
     function init() {
         earthquakes = $('#earthquakes');
@@ -58,6 +59,10 @@ var sideBarLists = (function($, L, document) {
         listItem.append(stateSpan);
         listItem.on('click', click);
         ul.append(listItem);
+        autoCompleteSource.push({
+            label: company,
+            value: geojson.properties.OBJECTID
+        });
     }
     
     function addArticleListItem(index, xmlitem) {
@@ -247,6 +252,27 @@ var sideBarLists = (function($, L, document) {
         });
         $('#articles').prepend(errorSpan);
     }
+
+    function enableAutoComplete() {
+        $.ui.autocomplete.filter = function (array, term) {
+            var matcher = new RegExp("^" + $.ui.autocomplete.escapeRegex(term), "i");
+                return $.grep(array, function (value) {
+                    return matcher.test(value.label || value.value || value);
+                });
+        };
+        var input = $('<input/>');
+        input.autocomplete({source: autoCompleteSource});
+        input.on('autocompleteselect', function(event, ui){
+            scrollTo(ui.item.value, 'projects');
+            input.val(ui.item.label);
+            return false;
+        });
+        input.on('autocompletefocus', function(event, ui){
+            return false;
+        });
+        $('#projectscontainer').prepend(input);
+    }
+
     return {
         init: init,
         addArticleListItem: addArticleListItem,
@@ -258,6 +284,7 @@ var sideBarLists = (function($, L, document) {
         sortByDate: sortByDate,
         scrollTo: scrollTo,
         displayProjectsError: displayProjectsError,
-        displayArticlesError: displayArticlesError
+        displayArticlesError: displayArticlesError,
+        enableAutoComplete: enableAutoComplete
     };
 })($, L, this.document);

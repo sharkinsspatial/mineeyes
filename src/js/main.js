@@ -191,6 +191,7 @@ var app = (function($, L, document) {
                     sideBarLists.addProjectListItem(feature);
             }
         });
+        sideBarLists.enableAutoComplete();
         projectData = geojson;
         projectMarkers.addMarkers(geojson);
         sideBarLists.sortByAlpha();
