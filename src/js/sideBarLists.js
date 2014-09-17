@@ -218,7 +218,7 @@ var sideBarLists = (function($, L, document) {
             }).each(function() {
                 list.append(this);
                 _projectssearchSource.push({
-                    label: this.innerText,
+                    label: this.firstChild.innerText,
                     value: this.id
                 });
             });
@@ -261,7 +261,8 @@ var sideBarLists = (function($, L, document) {
                     return matcher.test(value.label || value.value || value);
                 });
         };
-        _projectssearch.autocomplete({source: _projectssearchSource});
+        _projectssearch.autocomplete({source: _projectssearchSource,
+                                      appendTo: $('#projectscontainer')});
         _projectssearch.on('autocompleteselect', function(event, ui){
             scrollTo(ui.item.value, 'projects');
             $(document).trigger('projectsActivated', [ui.item.value]);
