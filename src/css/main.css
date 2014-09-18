@@ -31,14 +31,6 @@ html, body {
 #sidebar.active {
     right: 0;
 }
-#projectssearch {
-    width: 90%;
-    margin-right: 4%;
-    margin-left: 4%;
-    margin-top: 3%;
-    font-family: inherit;
-    font-size: 0.8em;
-}
 ul {
     padding: 0;
 }
@@ -66,9 +58,21 @@ li .earthquaketitle {
 li input {
     width: 100%;
 }
+#projectssearch {
+    width: 90%;
+    margin-right: 4%;
+    margin-left: 4%;
+    margin-top: 3%;
+}
 .ui-autocomplete {
     font-family: inherit;
     font-size: 1em;
+}
+.ui-widget-content .ui-state-focus {
+    background: #E4DADA;
+    border-bottom-style: solid;
+    border-bottom-color: #B9C0C5;
+    border-bottom-width: 0.1em;
 }
 li a, li .sub {
     font-size: 80%;

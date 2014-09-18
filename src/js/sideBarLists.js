@@ -179,6 +179,9 @@ var sideBarLists = (function($, L, document) {
                 earthquakes.outerHeight() + earthquakesLabel.outerHeight();
             scrollPosition = activeLi.position().top - offsetHeight;
         }
+        if (div.attr('id') == 'projects') {
+            _projectssearch.val('');
+        }
         div.animate({
             duration: 'slow',
             scrollTop: scrollPosition
@@ -195,6 +198,9 @@ var sideBarLists = (function($, L, document) {
         var slider = activeLi.children('input').first();
         slider.prop('disabled', false);
         $(document).trigger(event, [activeLi.attr('id')]);
+        if (source == 'projects') {
+            _projectssearch.val('');
+        }
     }
     
     function sortByAlpha() {
@@ -255,13 +261,7 @@ var sideBarLists = (function($, L, document) {
     }
 
     function enableAutoComplete() {
-        $.ui.autocomplete.filter = function (array, term) {
-            var matcher = new RegExp("^" + $.ui.autocomplete.escapeRegex(term), "i");
-                return $.grep(array, function (value) {
-                    return matcher.test(value.label || value.value || value);
-                });
-        };
-        _projectssearch.autocomplete({source: _projectssearchSource,
+       _projectssearch.autocomplete({source: _projectssearchSource,
                                       appendTo: $('#projectscontainer')});
         _projectssearch.on('autocompleteselect', function(event, ui){
             scrollTo(ui.item.value, 'projects');
