@@ -84,6 +84,7 @@ var app = (function($, L, document) {
         });
 
         $(document).on('earthquakesDeactivated', function(e, id) {
+            earthquakeMarkers.deactivateMarker(id);
             map.removeLayer(filteredProjectMarkers);
         });
         

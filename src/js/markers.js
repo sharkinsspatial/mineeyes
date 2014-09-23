@@ -145,7 +145,14 @@ var markers = (function($, L, document) {
                 },
                 zoomToMarker: function(id) {
                     var activeMarker = this._markerMap[id];
+                    activeMarker.setStyle({color: '#cb2944'});
                     activeMarker._map.fitBounds(activeMarker.getBounds(), {maxZoom: 8});
+                },
+                deactivateMarker: function(id) {
+                    var previousActiveMarker = this._markerMap[id];  
+                    if (previousActiveMarker) {
+                        previousActiveMarker.setStyle({color: '#03f'});
+                    }
                 }
             });
             return new earthquakeMarkers(null);
