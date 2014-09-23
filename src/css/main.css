@@ -220,6 +220,11 @@ li.active a, li.active .sub {
     border-bottom-color: #B9C0C5;
     border-bottom-width: 0.1em;
 }
+#filteredprojectslabel {
+    border-top-style: solid;
+    border-top-color: #B9C0C5;
+    border-top-width: 0.1em;
+}
 [type=radio]:checked ~ label {
     background: #f4f4f4;
     border-bottom: 0.05em solid #f4f4f4;
