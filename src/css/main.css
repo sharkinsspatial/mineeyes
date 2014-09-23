@@ -6,6 +6,7 @@ html, body {
     font-family: "HelveticaNeue-Light", "Helvetica Neue Light", 
         "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; 
     font-weight: 2200;
+    background-color: #E4DADA;
 }
 #map {
     width: 100%;
@@ -93,7 +94,6 @@ li a:hover {
     #footer {
         height: 10%;
         clear: both;
-        background: linear-gradient(to right, #cb2944, #f4f4f4);
     }
     #map {
         position: relative;
@@ -217,7 +217,7 @@ li.active a, li.active .sub {
 .splitContentLabels {
     height: 5%;
     text-align: center;
-    padding-top: 8%;
+    padding-top: 1em;
     font-weight: bold;
     border-bottom-style: solid;
     border-bottom-color: #B9C0C5;
