@@ -6,7 +6,7 @@ var app = (function($, L, document) {
         earthquakeMarkers = new markers.EarthquakeMarkers();
         filteredProjectMarkers = new markers.FilteredProjectMarkers(null, null);
         projectData = null;
-        map = L.mapbox.map('map', 'sharkins.map-uwias8cf', {maxZoom:12});
+        map = L.mapbox.map('map', 'sharkins.jk2fdko6', {maxZoom:12});
         map.on('ready', function() {
             var miniMap = new L.Control.MiniMap(L.mapbox.tileLayer(
                 'sharkins.hc52c67l'), {position: 'bottomleft'})

@@ -217,7 +217,8 @@ li.active a, li.active .sub {
 .splitContentLabels {
     height: 5%;
     text-align: center;
-    padding-top: 1em;
+    padding-top: 0.8em;
+    padding-bottom: 0.2m;
     font-weight: bold;
     border-bottom-style: solid;
     border-bottom-color: #B9C0C5;
