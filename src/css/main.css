@@ -95,6 +95,7 @@ li a:hover {
         height: 10%;
         clear: both;
         background-color: #302D3A;
+        position: static;
     }
     #map {
         position: relative;
@@ -244,6 +245,17 @@ li.active a, li.active .sub {
     margin-top: 15px;
     clear: left;
 }
+.hexlabel {
+    color: #302D3A;
+    font-weight: bold;
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-right: -50%;
+    transform: translate(-50%, -50%);
+    -webkit-transform: translate(-50%, -50%);
+}
 .hex {
     float: left;
     margin-left: 1px;
@@ -258,6 +270,7 @@ li.active a, li.active .sub {
 .hex .middle {
     width: 52px;
     height: 30px;
+    position: relative;
 }
 .hex .bottom {
     width: 0;
