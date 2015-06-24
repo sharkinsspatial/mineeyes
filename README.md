@@ -5,7 +5,7 @@ frameworks to brush up my memory a bit.  Provides information about current
 mining protests, mining projects and earthquakes with respect to Canadian
 workers in Peru.
 
-Development requirements assume Node, NPM and Grunt installed on your system.  To install the Grunt cli
+Development requirements assume Grunt installed on your system.  To install the Grunt cli
 ````shell
 $ npm install -g grunt-cli
 ````
@@ -23,6 +23,6 @@ To deploy to production on Amazon s3 you will need to create a .json file with y
 
 You can then run 
 ````shell
-$ grunt build
-```` Which will create a production build of the application and push it to s3
-for hosting.
+$ grunt build ````
+Which will create a production build of the application and push it to s3 for
+hosting.
