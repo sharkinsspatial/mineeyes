@@ -1,4 +1,5 @@
 Attempt at building a simple responsive application without using MV* or CSS frameworks to brush up my memory a bit. Provides information about current mining protests, mining projects and earthquakes with respect to Canadian workers in Peru.
+
 Development requirements assume Grunt installed on your system.  To install the Grunt cli
 ````shell
 $ npm install -g grunt-cli
