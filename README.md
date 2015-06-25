@@ -21,7 +21,3 @@ You can then run
 $ grunt build
 ````
 Which will create a production build of the application and push it to s3 for
-hosting. ```` shell 
-$ grunt jasmine 
-```` 
-Will run the unit tests.
