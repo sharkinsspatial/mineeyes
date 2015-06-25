@@ -4,6 +4,10 @@ Development requirements assume Grunt installed on your system.  To install the 
 ````shell
 $ npm install -g grunt-cli
 ````
+To install the project's dependencies and development dependencies change to the project's root directory and run
+````shell
+$ npm install
+````
 To serve the application locally I use [serve](https://github.com/tj/serve) you can install it globally using
 ````shell
 $ npm install -g serve
@@ -22,7 +26,7 @@ $ grunt build
 ````
 Which will create a production build of the application and push it to s3 for
 
-You can runt unit tests with 
+You can run unit tests with 
 ````shell
 $ grunt jasmine
 ````
