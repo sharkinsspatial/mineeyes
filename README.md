@@ -8,7 +8,7 @@ To serve the application locally I use [serve](https://github.com/tj/serve) you 
 ````shell
 $ npm install -g serve
 ````
-And run
+And from the /src directory run
 ````shell
 $ serve
 ````
@@ -21,3 +21,8 @@ You can then run
 $ grunt build
 ````
 Which will create a production build of the application and push it to s3 for
+
+You can runt unit tests with 
+````shell
+$ grunt jasmine
+````
